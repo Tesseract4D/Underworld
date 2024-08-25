@@ -35,4 +35,5 @@
  */
 dependencies {
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.5.4-GTNH:dev")
+    implementation files("libs/+MysteriumLib-1.5.10.jar")
 }
