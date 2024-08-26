@@ -82,7 +82,7 @@ public final class ChunkProviderUnderworld implements IChunkProvider {
         noise_gen_bedrock_strata_4_bump = new NoiseGeneratorOctaves(this.hellRNG, 4);
     }
 
-    public void generateNetherTerrain(int par1, int par2, Block[] par3ArrayOfByte) {
+    public void generateNetherTerrain(int par1, int par2, Block[] blocks) {
         byte var4 = 4;
         byte var5 = 32;
         int var6 = var4 + 1;
@@ -113,9 +113,8 @@ public final class ChunkProviderUnderworld implements IChunkProvider {
                         double var35 = var16;
                         double var37 = (var18 - var14) * var31;
                         double var39 = (var20 - var16) * var31;
-
                         for (int var41 = 0; var41 < 4; ++var41) {
-                            int var42 = var41 + var9 * 4 << 11 | var10 * 4 << 7 | var11 * 8 + var30;
+                            int var42 = var41 + (var9 << 2) << 11 | (var10 << 2) << 7 | (var11 << 3) + var30;
                             short var43 = 128;
                             double var44 = 0.25;
                             double var46 = var33;
@@ -123,7 +122,7 @@ public final class ChunkProviderUnderworld implements IChunkProvider {
 
                             for (int var50 = 0; var50 < 4; ++var50) {
                                 Block var51 = null;
-                                if (var11 * 8 + var30 < var5 - 8) {
+                                if ((var11 << 3) + var30 < var5 - 8) {
                                     var51 = Blocks.water;
                                 }
 
@@ -131,7 +130,7 @@ public final class ChunkProviderUnderworld implements IChunkProvider {
                                     var51 = Blocks.stone;
                                 }
 
-                                par3ArrayOfByte[var42] = var51;
+                                blocks[var42] = var51;
                                 var42 += var43;
                                 var46 += var48;
                             }
@@ -158,11 +157,9 @@ public final class ChunkProviderUnderworld implements IChunkProvider {
                 this.hellRNG.nextDouble();
                 this.hellRNG.nextDouble();
 
-                for (int var15 = 127; var15 >= 0; --var15) {
-                    int var16 = (var8 * 16 + var7) * 128 + var15;
-                    if (var15 >= 127 - this.hellRNG.nextInt(5) || var15 <= this.hellRNG.nextInt(5)) {
+                for (int var15 = 0; var15 <= 1 + this.hellRNG.nextInt(5); ++var15) {
+                    int var16 = (((var8 << 4) + var7) << 7) + (127 - var15);
                         par3ArrayOfByte[var16] = Blocks.bedrock;
-                    }
                 }
             }
         }
@@ -206,7 +203,7 @@ public final class ChunkProviderUnderworld implements IChunkProvider {
             int y = RNG.int_126_plus_1[random_number_index & 32767];
             ++random_number_index;
             int z = RNG.int_14_plus_1[random_number_index & 32767];
-            int index = (z * 16 + x) * 128 + y;
+            int index = (((z << 4) + x) << 7) + y;
             if (block_ids[index] == null) {
                 Block block_id_above = block_ids[index + 1];
                 Block block_id_below = block_ids[index - 1];

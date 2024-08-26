@@ -7,17 +7,23 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockMushroom;
 import net.minecraft.entity.monster.EntityCaveSpider;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeDecorator;
 import net.minecraft.world.biome.BiomeGenBase;
 
 import java.util.List;
 import java.util.Random;
 
 public class BiomeGenUnderworld extends BiomeGenBase {
+    public static BiomeGenBase biome;
     public BiomeGenUnderworld(int id) {
         super(id);
         this.spawnableMonsterList.add(new SpawnListEntry(EntityCaveSpider.class, 40, 1, 2));
+    }
+
+    @Override
+    public BiomeDecorator createBiomeDecorator() {
+        return new UnderworldDecorator();
     }
 
     public void decorate(World world, Random random, int chunk_origin_x, int chunk_origin_z) {

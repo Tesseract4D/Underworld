@@ -3,8 +3,8 @@ package mods.tesseract.underworld;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import mods.tesseract.underworld.biomes.BiomeGenUnderworld;
 import mods.tesseract.underworld.world.WorldProviderUnderworld;
-import net.minecraft.init.Blocks;
 import net.minecraftforge.common.DimensionManager;
 import net.tclproject.mysteriumlib.asm.common.CustomLoadingPlugin;
 import net.tclproject.mysteriumlib.asm.common.FirstClassTransformer;
@@ -13,6 +13,7 @@ import net.tclproject.mysteriumlib.asm.common.FirstClassTransformer;
 public class Main extends CustomLoadingPlugin {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
+        BiomeGenUnderworld.biome = (new BiomeGenUnderworld(26)).setColor(16711680).setBiomeName("Underworld").setDisableRain().setTemperatureRainfall(1.0F, 0.0F);
     }
 
     @Mod.EventHandler

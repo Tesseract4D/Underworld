@@ -1,10 +1,9 @@
 package mods.tesseract.underworld.world;
 
 
-import net.minecraft.entity.EntityLivingBase;
+import mods.tesseract.underworld.biomes.BiomeGenUnderworld;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.WorldProvider;
-import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.WorldChunkManagerHell;
 import net.minecraft.world.chunk.IChunkProvider;
 
@@ -14,7 +13,7 @@ public class WorldProviderUnderworld extends WorldProvider {
         //this.isHellWorld = true;
         this.hasNoSky = true;
         this.dimensionId = -2;
-        this.worldChunkMgr = new WorldChunkManagerHell(BiomeGenBase.sky, 0.0F);
+        this.worldChunkMgr = new WorldChunkManagerHell(BiomeGenUnderworld.biome, 0.0F);
     }
 
     @Override
