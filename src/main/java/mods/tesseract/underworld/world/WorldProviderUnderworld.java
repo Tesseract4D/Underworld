@@ -10,7 +10,7 @@ import net.minecraft.world.chunk.IChunkProvider;
 public class WorldProviderUnderworld extends WorldProvider {
 
     public void registerWorldChunkManager() {
-        //this.isHellWorld = true;
+        this.isHellWorld = true;
         this.hasNoSky = true;
         this.dimensionId = -2;
         this.worldChunkMgr = new WorldChunkManagerHell(BiomeGenUnderworld.biome, 0.0F);

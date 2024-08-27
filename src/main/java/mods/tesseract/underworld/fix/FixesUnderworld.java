@@ -1,30 +1,31 @@
 package mods.tesseract.underworld.fix;
 
+import mods.tesseract.underworld.Main;
 import mods.tesseract.underworld.util.ChunkPostField;
 import mods.tesseract.underworld.util.RNG;
 import mods.tesseract.underworld.world.ChunkProviderUnderworld;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-import net.minecraft.profiler.Profiler;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldProvider;
-import net.minecraft.world.WorldSettings;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
-import net.minecraft.world.storage.ISaveHandler;
+import net.minecraftforge.common.DimensionManager;
 import net.tclproject.mysteriumlib.asm.annotations.EnumReturnSetting;
 import net.tclproject.mysteriumlib.asm.annotations.Fix;
 
 import java.util.Random;
 
+@SuppressWarnings("unused")
 public class FixesUnderworld {
-    @Fix(targetMethod = "<init>", insertOnExit = true)
-    public static void World(World c, ISaveHandler p_i45369_1_, String p_i45369_2_, WorldSettings p_i45369_3_, WorldProvider p_i45369_4_, Profiler p_i45369_5_) {
-        System.out.println("&" + c.getSeed());
-        Random rand = new Random(c.getSeed());
-        rand.nextInt();
-        ((IWorld) c).mycelium_posts.setHashedWorldSeed(rand.nextLong());
-        RNG.init(c);
+    @Fix
+    public static void setWorld(DimensionManager c, int id, WorldServer world) {
+        if (id == -2 && world != null) {
+            Random rand = new Random(world.getSeed());
+            rand.nextInt();
+            ((IWorld) world).mycelium_posts.setHashedWorldSeed(rand.nextLong());
+            RNG.init(world);
+        }
     }
 
     @Fix(targetMethod = "<init>", insertOnLine = 1, returnSetting = EnumReturnSetting.ON_TRUE, nullReturned = true)
@@ -34,8 +35,7 @@ public class FixesUnderworld {
         int base_z = c.zPosition << 4;
         if (world.provider.dimensionId == -2) {
             Random random = new Random(world.getSeed() * (long) ChunkPostField.getIntPairHash(c.xPosition, c.zPosition));
-            //int y_offset = world.underworld_y_offset;
-            int y_offset = 120;
+            int y_offset = Main.underworld_y_offset;
             double scale_xz = 0.015625;
             double scale_y = 0.03125;
             ChunkProviderUnderworld.bedrock_strata_1a_noise = ChunkProviderUnderworld.noise_gen_bedrock_strata_1a.generateNoiseOctaves(ChunkProviderUnderworld.bedrock_strata_1a_noise, base_x, 0, base_z, 16, 1, 16, scale_xz * 2.0, scale_y * 2.0, scale_xz * 2.0);

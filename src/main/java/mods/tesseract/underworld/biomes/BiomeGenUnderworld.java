@@ -1,5 +1,6 @@
 package mods.tesseract.underworld.biomes;
 
+import mods.tesseract.underworld.Main;
 import mods.tesseract.underworld.fix.IWorld;
 import mods.tesseract.underworld.util.ChunkPost;
 import mods.tesseract.underworld.util.ChunkPostField;
@@ -45,8 +46,7 @@ public class BiomeGenUnderworld extends BiomeGenBase {
                         random.setSeed(post.getSeed());
                         random.nextInt();
                         int y = random.nextInt(random.nextBoolean() ? 16 : 72) + 24;
-                        //y += world.underworld_y_offset;
-                        y += 120;
+                        y += Main.underworld_y_offset;
                         int height = random.nextInt(5) + 1;
 
                         for (int dy = 0; dy < height; ++dy) {

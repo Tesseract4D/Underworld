@@ -24,6 +24,18 @@ public class UnderworldDecorator extends BiomeDecorator {
 
     @Override
     protected void genDecorations(BiomeGenBase biome) {
-        biome.decorate(currentWorld, randomGenerator, chunk_X, chunk_Z);
+        if (this.randomGenerator.nextInt(6) == 0) {
+            int x = this.chunk_X + this.randomGenerator.nextInt(16) + 8;
+            int y = this.randomGenerator.nextInt(128);
+            int z = this.chunk_Z + this.randomGenerator.nextInt(16) + 8;
+            this.mushroomRedGen.generate(this.currentWorld, this.randomGenerator, x, y, z);
+        }
+
+        if (this.randomGenerator.nextInt(4) == 0) {
+            int x = this.chunk_X + this.randomGenerator.nextInt(16) + 8;
+            int y = this.randomGenerator.nextInt(128);
+            int z = this.chunk_Z + this.randomGenerator.nextInt(16) + 8;
+            this.mushroomBrownGen.generate(this.currentWorld, this.randomGenerator, x, y, z);
+        }
     }
 }

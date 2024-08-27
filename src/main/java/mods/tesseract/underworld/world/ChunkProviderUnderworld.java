@@ -1,5 +1,6 @@
 package mods.tesseract.underworld.world;
 
+import mods.tesseract.underworld.Main;
 import mods.tesseract.underworld.util.RNG;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
@@ -151,18 +152,7 @@ public final class ChunkProviderUnderworld implements IChunkProvider {
     }
 
     public void replaceBlocksForBiome(int par1, int par2, Block[] par3ArrayOfByte) {
-        for (int var7 = 0; var7 < 16; ++var7) {
-            for (int var8 = 0; var8 < 16; ++var8) {
-                this.hellRNG.nextDouble();
-                this.hellRNG.nextDouble();
-                this.hellRNG.nextDouble();
 
-                for (int var15 = 0; var15 <= 1 + this.hellRNG.nextInt(5); ++var15) {
-                    int var16 = (((var8 << 4) + var7) << 7) + (127 - var15);
-                        par3ArrayOfByte[var16] = Blocks.bedrock;
-                }
-            }
-        }
     }
 
     public Chunk loadChunk(int par1, int par2) {
@@ -363,7 +353,7 @@ public final class ChunkProviderUnderworld implements IChunkProvider {
         //if (this.worldObj.underworld_y_offset != 0) {
         for (int i = 0; i < 16; ++i) {
             int x = var4 + this.hellRNG.nextInt(16) + 8;
-            int y = this.hellRNG.nextInt(32) + 20 + 120/*this.worldObj.underworld_y_offset*/;
+            int y = this.hellRNG.nextInt(32) + 20 + Main.underworld_y_offset;
             int z = var5 + this.hellRNG.nextInt(16) + 8;
             (new WorldGenDungeons()).generate(this.worldObj, this.hellRNG, x, y, z);
         }

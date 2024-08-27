@@ -11,6 +11,7 @@ import net.tclproject.mysteriumlib.asm.common.FirstClassTransformer;
 
 @Mod(modid = "underworld", acceptedMinecraftVersions = "[1.7.10]")
 public class Main extends CustomLoadingPlugin {
+    public static int underworld_y_offset = 120;
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
         BiomeGenUnderworld.biome = (new BiomeGenUnderworld(26)).setColor(16711680).setBiomeName("Underworld").setDisableRain().setTemperatureRainfall(1.0F, 0.0F);
