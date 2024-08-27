@@ -1,6 +1,7 @@
 package mods.tesseract.underworld.world;
 
 import mods.tesseract.underworld.Main;
+import mods.tesseract.underworld.fix.IWorld;
 import mods.tesseract.underworld.util.RNG;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
@@ -164,7 +165,7 @@ public final class ChunkProviderUnderworld implements IChunkProvider {
         Block[] var3 = new Block[32768];
         this.generateNetherTerrain(par1, par2, var3);
         this.replaceBlocksForBiome(par1, par2, var3);
-        placeRandomCobwebs(par1, par2, var3, this.hellRNG);
+        placeRandomCobwebs(worldObj, var3, this.hellRNG);
         Chunk var4 = new Chunk(this.worldObj, var3, par1, par2);
         BiomeGenBase[] var5 = this.worldObj.getWorldChunkManager().loadBlockGeneratorData(null, par1 * 16, par2 * 16, 16, 16);
         byte[] var6 = var4.getBiomeArray();
@@ -178,21 +179,22 @@ public final class ChunkProviderUnderworld implements IChunkProvider {
         return var4;
     }
 
-    public static void placeRandomCobwebs(int chunk_x, int chunk_z, Block[] block_ids, Random rand) {
+    public static void placeRandomCobwebs(World world, Block[] block_ids, Random rand) {
         int random_number_index = rand.nextInt();
         Block web_block_id = Blocks.web;
         Block lava_still_block_id = Blocks.lava;
         Block lava_moving_block_id = Blocks.flowing_lava;
         Block stone_block_id = Blocks.stone;
         int frequency = 128;
+        RNG rng = ((IWorld) world).rng;
 
         for (int attempts = 0; attempts < frequency; ++attempts) {
             ++random_number_index;
-            int x = RNG.int_14_plus_1[random_number_index & 32767];
+            int x = rng.int_14_plus_1[random_number_index & 32767];
             ++random_number_index;
-            int y = RNG.int_126_plus_1[random_number_index & 32767];
+            int y = rng.int_126_plus_1[random_number_index & 32767];
             ++random_number_index;
-            int z = RNG.int_14_plus_1[random_number_index & 32767];
+            int z = rng.int_14_plus_1[random_number_index & 32767];
             int index = (((z << 4) + x) << 7) + y;
             if (block_ids[index] == null) {
                 Block block_id_above = block_ids[index + 1];

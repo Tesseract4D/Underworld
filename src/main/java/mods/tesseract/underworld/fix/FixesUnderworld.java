@@ -20,11 +20,11 @@ import java.util.Random;
 public class FixesUnderworld {
     @Fix
     public static void setWorld(DimensionManager c, int id, WorldServer world) {
+        ((IWorld) world).rng.init(world);
         if (id == -2 && world != null) {
             Random rand = new Random(world.getSeed());
             rand.nextInt();
             ((IWorld) world).mycelium_posts.setHashedWorldSeed(rand.nextLong());
-            RNG.init(world);
         }
     }
 
@@ -33,6 +33,7 @@ public class FixesUnderworld {
         int maxY = blocks.length / 256;
         int base_x = c.xPosition << 4;
         int base_z = c.zPosition << 4;
+        RNG rng = ((IWorld) world).rng;
         if (world.provider.dimensionId == -2) {
             Random random = new Random(world.getSeed() * (long) ChunkPostField.getIntPairHash(c.xPosition, c.zPosition));
             int y_offset = Main.underworld_y_offset;
@@ -92,7 +93,7 @@ public class FixesUnderworld {
                                             bedrock_noise += bump_noise * 0.25 + 0.25;
                                         }
                                         if (dy < 0) {
-                                            if (RNG.chance_in_2[++rng_index & Short.MAX_VALUE]) {
+                                            if (rng.chance_in_2[++rng_index & Short.MAX_VALUE]) {
                                                 ++dy;
                                             }
                                             dy = -dy;
@@ -110,7 +111,7 @@ public class FixesUnderworld {
                                             bedrock_noise += bump_noise * 0.25 + 0.25;
                                         }
                                         if (dy < 0) {
-                                            if (RNG.chance_in_2[++rng_index & Short.MAX_VALUE]) {
+                                            if (rng.chance_in_2[++rng_index & Short.MAX_VALUE]) {
                                                 ++dy;
                                             }
                                             dy = -dy;
@@ -128,7 +129,7 @@ public class FixesUnderworld {
                                             bedrock_noise += bump_noise * 0.25 + 0.25;
                                         }
                                         if (dy < 0) {
-                                            if (RNG.chance_in_2[++rng_index & Short.MAX_VALUE]) {
+                                            if (rng.chance_in_2[++rng_index & Short.MAX_VALUE]) {
                                                 ++dy;
                                             }
                                             dy = -dy;
