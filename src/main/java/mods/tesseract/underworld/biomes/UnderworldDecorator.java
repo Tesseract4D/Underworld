@@ -3,10 +3,16 @@ package mods.tesseract.underworld.biomes;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeDecorator;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.gen.feature.WorldGenBigMushroom;
 
 import java.util.Random;
 
 public class UnderworldDecorator extends BiomeDecorator {
+    public UnderworldDecorator() {
+        super();
+        this.bigMushroomGen = new WorldGenBigMushroom(0);
+    }
+
     @Override
     public void decorateChunk(World worldIn, Random random, BiomeGenBase biome, int x, int z) {
         if (this.currentWorld != null) {

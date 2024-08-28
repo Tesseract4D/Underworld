@@ -13,7 +13,7 @@ public class ChunkPostField {
     private final Random random;
     private final int type;
     private final long hashed_type;
-    public long hashed_world_seed;
+    private long hashed_world_seed;
     private final int post_max_radius_of_effect;
     private final int post_max_radius_of_effect_sq;
     private final int field_chunk_range;

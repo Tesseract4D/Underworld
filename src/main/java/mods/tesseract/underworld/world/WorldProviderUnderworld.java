@@ -1,6 +1,8 @@
 package mods.tesseract.underworld.world;
 
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import mods.tesseract.underworld.biomes.BiomeGenUnderworld;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.WorldProvider;
@@ -10,7 +12,6 @@ import net.minecraft.world.chunk.IChunkProvider;
 public class WorldProviderUnderworld extends WorldProvider {
 
     public void registerWorldChunkManager() {
-        this.isHellWorld = true;
         this.hasNoSky = true;
         this.dimensionId = -2;
         this.worldChunkMgr = new WorldChunkManagerHell(BiomeGenUnderworld.biome, 0.0F);
@@ -21,6 +22,7 @@ public class WorldProviderUnderworld extends WorldProvider {
         return "Underworld";
     }
 
+    @SideOnly(Side.CLIENT)
     public Vec3 getFogColor(float par1, float par2) {
         int day_of_cycle = (int) ((this.worldObj.getTotalWorldTime() / 24000L) % 32);
         int distance_from_peak = Math.abs(day_of_cycle - 16);
@@ -44,7 +46,16 @@ public class WorldProviderUnderworld extends WorldProvider {
         return false;
     }
 
-    public boolean doesXZShowFog(int x, int y, int z) {
+    public boolean isSurfaceWorld() {
         return false;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public float getCloudHeight() {
+        return 8.0F;
+    }
+
+    public boolean doesXZShowFog(int x, int z) {
+        return true;
     }
 }

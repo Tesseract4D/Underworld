@@ -1,10 +1,14 @@
 package mods.tesseract.underworld.fix;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import mods.tesseract.underworld.Main;
 import mods.tesseract.underworld.util.ChunkPostField;
 import mods.tesseract.underworld.util.RNG;
 import mods.tesseract.underworld.world.ChunkProviderUnderworld;
 import net.minecraft.block.Block;
+import net.minecraft.client.gui.GuiIngame;
+import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -13,6 +17,8 @@ import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraftforge.common.DimensionManager;
 import net.tclproject.mysteriumlib.asm.annotations.EnumReturnSetting;
 import net.tclproject.mysteriumlib.asm.annotations.Fix;
+import net.tclproject.mysteriumlib.asm.annotations.LocalVariable;
+import org.lwjgl.opengl.GL11;
 
 import java.util.Random;
 
@@ -28,13 +34,31 @@ public class FixesUnderworld {
         }
     }
 
+    @Fix(returnSetting = EnumReturnSetting.ON_TRUE, nullReturned = true)
+    @SideOnly(Side.CLIENT)
+    public static boolean renderVignette(GuiIngame c, float x, int y, int z) {
+        if (c.mc.theWorld.provider.dimensionId == -2) {
+            GL11.glDepthMask(true);
+            GL11.glEnable(2929);
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+            GL11.glBlendFunc(770, 771);
+            return true;
+        }
+        return false;
+    }
+
+    @Fix(insertOnInvoke = "org/lwjgl/opengl/GL11;glFogi(II)V", insertOnLine = 7)
+    private void setupFog(EntityRenderer c, int x, float z, @LocalVariable(index = 4) boolean flag, @LocalVariable(index = 6) float f1) {
+        if (!flag && c.mc.theWorld.provider.dimensionId == -2) f1 = 128;
+    }
+
     @Fix(targetMethod = "<init>", insertOnLine = 1, returnSetting = EnumReturnSetting.ON_TRUE, nullReturned = true)
     public static boolean Chunk(Chunk c, World world, Block[] blocks, int cx, int xz) {
         int maxY = blocks.length / 256;
         int base_x = c.xPosition << 4;
         int base_z = c.zPosition << 4;
-        RNG rng = ((IWorld) world).rng;
         if (world.provider.dimensionId == -2) {
+            RNG rng = ((IWorld) world).rng;
             Random random = new Random(world.getSeed() * (long) ChunkPostField.getIntPairHash(c.xPosition, c.zPosition));
             int y_offset = Main.underworld_y_offset;
             double scale_xz = 0.015625;
@@ -153,9 +177,8 @@ public class FixesUnderworld {
                             c.storageArrays[var10].func_150818_a(var6, var8 & 0xF, var7, var9);
                             if (var9.getLightValue() > 0) {
                                 c.storageArrays[var10].setExtBlocklightValue(index, var8 & 15, var7, var9.getLightValue());
-                                if (blocks[index + 1] == null) {
+                                //if (blocks[index + 1] == null)
                                     //this.addPendingBlocklightUpdate(base_x + var6, var8, base_z + var7);
-                                }
                             }
                         }
                         var8 -= y_offset;
