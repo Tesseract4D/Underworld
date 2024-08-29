@@ -9,6 +9,7 @@ import mods.tesseract.underworld.world.ChunkProviderUnderworld;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.renderer.EntityRenderer;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -18,6 +19,7 @@ import net.minecraftforge.common.DimensionManager;
 import net.tclproject.mysteriumlib.asm.annotations.EnumReturnSetting;
 import net.tclproject.mysteriumlib.asm.annotations.Fix;
 import net.tclproject.mysteriumlib.asm.annotations.LocalVariable;
+import net.tclproject.mysteriumlib.asm.annotations.ReturnedValue;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Random;
@@ -48,8 +50,13 @@ public class FixesUnderworld {
     }
 
     @Fix(insertOnInvoke = "org/lwjgl/opengl/GL11;glFogi(II)V", insertOnLine = 7)
-    private void setupFog(EntityRenderer c, int x, float z, @LocalVariable(index = 4) boolean flag, @LocalVariable(index = 6) float f1) {
-        if (!flag && c.mc.theWorld.provider.dimensionId == -2) f1 = 128;
+    public static void setupFog(EntityRenderer c, int x, float z, @LocalVariable(index = 4) boolean flag) {
+
+    }
+
+    @Fix(insertOnExit = true, returnSetting = EnumReturnSetting.ALWAYS)
+    public static float getNightVisionBrightness(EntityRenderer c, EntityPlayer player, float d, @ReturnedValue float b) {
+        return player.worldObj.provider.dimensionId == -2 && Thread.currentThread().getStackTrace()[3].getMethodName().equals("updateFogColor") ? 0 : b;
     }
 
     @Fix(targetMethod = "<init>", insertOnLine = 1, returnSetting = EnumReturnSetting.ON_TRUE, nullReturned = true)

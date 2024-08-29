@@ -6,6 +6,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import mods.tesseract.underworld.biomes.BiomeGenUnderworld;
 import mods.tesseract.underworld.world.WorldProviderUnderworld;
 import net.minecraft.client.renderer.EntityRenderer;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.DimensionManager;
 import net.tclproject.mysteriumlib.asm.common.CustomLoadingPlugin;
 import net.tclproject.mysteriumlib.asm.common.FirstClassTransformer;
@@ -21,10 +22,9 @@ public class Main extends CustomLoadingPlugin {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
         try {
-            //System.out.println("&" + new MetaReader().getLocalVariables(EntityRenderer.class.getDeclaredMethod("setupFog", int.class, float.class)));
-            //System.out.println("&" + MiscUtils.getMemberInfo(GL11.class.getDeclaredMethod("glFogi", int.class, int.class)));
+            System.out.println("&" + new MetaReader().getLocalVariables(EntityRenderer.class.getDeclaredMethod("updateFogColor", float.class)));
+            System.out.println("&" + MiscUtils.getMemberInfo(EntityRenderer.class.getDeclaredMethod("getNightVisionBrightness", EntityPlayer.class, float.class)));
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
         }
         BiomeGenUnderworld.biome = (new BiomeGenUnderworld(26)).setColor(16711680).setBiomeName("Underworld").setDisableRain().setTemperatureRainfall(1.0F, 0.0F);
     }

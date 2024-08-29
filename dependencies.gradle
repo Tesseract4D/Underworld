@@ -35,6 +35,5 @@
  */
 dependencies {
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.5.4-GTNH:dev")
-    implementation files("libs/+MysteriumLib-1.5.10-dev.jar")
-    implementation "maven.modrinth:mysteriumlibunofficial:1.5.9-1.7.10"
+    implementation name: '+Mycelium-1.5.10-dev'
 }
