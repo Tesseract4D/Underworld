@@ -26,7 +26,7 @@ public class WorldProviderUnderworld extends WorldProvider {
     public Vec3 getFogColor(float par1, float par2) {
         int day_of_cycle = (int) ((worldObj.getWorldTime() / 24000L) % 32);
         int distance_from_peak = Math.abs(day_of_cycle - 16);
-        float grayscale = distance_from_peak * distance_from_peak * distance_from_peak / 48000f;
+        float grayscale = distance_from_peak * distance_from_peak * distance_from_peak / 64000f;
         return Vec3.createVectorHelper(grayscale, grayscale, grayscale);
     }
 

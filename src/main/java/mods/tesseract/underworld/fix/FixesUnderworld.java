@@ -9,8 +9,13 @@ import mods.tesseract.underworld.world.ChunkProviderUnderworld;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.renderer.EntityRenderer;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
@@ -18,7 +23,6 @@ import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraftforge.common.DimensionManager;
 import net.tclproject.mysteriumlib.asm.annotations.EnumReturnSetting;
 import net.tclproject.mysteriumlib.asm.annotations.Fix;
-import net.tclproject.mysteriumlib.asm.annotations.LocalVariable;
 import net.tclproject.mysteriumlib.asm.annotations.ReturnedValue;
 import org.lwjgl.opengl.GL11;
 
@@ -49,14 +53,40 @@ public class FixesUnderworld {
         return false;
     }
 
-    @Fix(insertOnInvoke = "org/lwjgl/opengl/GL11;glFogi(II)V", insertOnLine = 7)
-    public static void setupFog(EntityRenderer c, int x, float z, @LocalVariable(index = 4) boolean flag) {
-
+    @Fix(createNewMethod = true)
+    public static float getFogNightVisionBrightness(EntityRenderer c, EntityPlayer player, float d) {
+        return player.worldObj.provider.dimensionId == -2 ? 0 : c.getNightVisionBrightness(player, d);
     }
 
+
     @Fix(insertOnExit = true, returnSetting = EnumReturnSetting.ALWAYS)
-    public static float getNightVisionBrightness(EntityRenderer c, EntityPlayer player, float d, @ReturnedValue float b) {
-        return player.worldObj.provider.dimensionId == -2 && Thread.currentThread().getStackTrace()[3].getMethodName().equals("updateFogColor") ? 0 : b;
+    public static boolean handleLavaMovement(Entity c, @ReturnedValue boolean b) {
+        return b || doesBoundingBoxContainBlock(c.worldObj, c.boundingBox.expand(0.001, 0.001, 0.001), Main.mantleOrCore);
+    }
+
+    public static boolean doesBoundingBoxContainBlock(World world, AxisAlignedBB box, Block b) {
+        int i = MathHelper.floor_double(box.minX);
+        int j = MathHelper.floor_double(box.maxX + 1.0D);
+        int k = MathHelper.floor_double(box.minY);
+        int l = MathHelper.floor_double(box.maxY + 1.0D);
+        int i1 = MathHelper.floor_double(box.minZ);
+        int j1 = MathHelper.floor_double(box.maxZ + 1.0D);
+
+        for (int k1 = i; k1 < j; ++k1) {
+            for (int l1 = k; l1 < l; ++l1) {
+                for (int i2 = i1; i2 < j1; ++i2) {
+                    if (world.getBlock(k1, l1, i2) == b) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    @Fix(insertOnExit = true)
+    public static void applyEntityAttributes(EntitySkeleton c) {
+        c.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(5);
     }
 
     @Fix(targetMethod = "<init>", insertOnLine = 1, returnSetting = EnumReturnSetting.ON_TRUE, nullReturned = true)
@@ -77,7 +107,7 @@ public class FixesUnderworld {
             ChunkProviderUnderworld.bedrock_strata_4_noise = ChunkProviderUnderworld.noise_gen_bedrock_strata_4.generateNoiseOctaves(ChunkProviderUnderworld.bedrock_strata_4_noise, base_x, 0, base_z, 16, 1, 16, scale_xz * 4.0, scale_y * 2.0, scale_xz * 4.0);
             scale_xz = 0.25;
             ChunkProviderUnderworld.bedrock_strata_1a_bump_noise = ChunkProviderUnderworld.noise_gen_bedrock_strata_1a_bump.generateNoiseOctaves(ChunkProviderUnderworld.bedrock_strata_1a_bump_noise, base_x, 0, base_z, 16, 1, 16, scale_xz * 0.5, scale_y * 2.0, scale_xz * 0.5);
-            ChunkProviderUnderworld.bedrock_strata_1b_bump_noise = ChunkProviderUnderworld.noise_gen_bedrock_strata_1b_bump.generateNoiseOctaves(ChunkProviderUnderworld.bedrock_strata_1b_bump_noise, base_x, 0, base_z, 16, 1, 16, scale_xz * 1.0, scale_y * 2.0, scale_xz * 1.0);
+            ChunkProviderUnderworld.bedrock_strata_1b_bump_noise = ChunkProviderUnderworld.noise_gen_bedrock_strata_1b_bump.generateNoiseOctaves(ChunkProviderUnderworld.bedrock_strata_1b_bump_noise, base_x, 0, base_z, 16, 1, 16, scale_xz, scale_y * 2.0, scale_xz);
             ChunkProviderUnderworld.bedrock_strata_1c_bump_noise = ChunkProviderUnderworld.noise_gen_bedrock_strata_1c_bump.generateNoiseOctaves(ChunkProviderUnderworld.bedrock_strata_1c_bump_noise, base_x, 0, base_z, 16, 1, 16, scale_xz * 2.0, scale_y * 2.0, scale_xz * 2.0);
             ChunkProviderUnderworld.bedrock_strata_2_bump_noise = ChunkProviderUnderworld.noise_gen_bedrock_strata_2_bump.generateNoiseOctaves(ChunkProviderUnderworld.bedrock_strata_2_bump_noise, base_x, 0, base_z, 16, 1, 16, scale_xz * 4.0, scale_y * 2.0, scale_xz * 4.0);
             ChunkProviderUnderworld.bedrock_strata_3_bump_noise = ChunkProviderUnderworld.noise_gen_bedrock_strata_3_bump.generateNoiseOctaves(ChunkProviderUnderworld.bedrock_strata_3_bump_noise, base_x, 0, base_z, 16, 1, 16, scale_xz * 4.0, scale_y * 2.0, scale_xz * 4.0);
@@ -92,7 +122,7 @@ public class FixesUnderworld {
                         if (var8 < 0 || var8 > 127) {
                             index = -1;
                             if ((var8 += y_offset) < num_bedrock_blocks) {
-                                var9 = Blocks.netherrack;
+                                var9 = Main.mantleOrCore;
                             } else if (var8 > 255 - num_bedrock_blocks) {
                                 var9 = Blocks.bedrock;
                             } else {
