@@ -1,49 +1,44 @@
 package mods.tesseract.underworld.biomes;
 
+import mods.tesseract.underworld.world.WorldGenMinableUnderworld;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeDecorator;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.gen.feature.WorldGenBigMushroom;
-import net.minecraft.world.gen.feature.WorldGenMinable;
+import net.minecraft.world.gen.feature.WorldGenerator;
 
 import java.util.Random;
 
-import static net.minecraft.world.EnumSkyBlock.Block;
-
 public class UnderworldDecorator extends BiomeDecorator {
-    private final WorldGenMinable silverfishGen;
+    private final WorldGenerator silverfishGen;
 
     public UnderworldDecorator() {
         super();
         this.bigMushroomGen = new WorldGenBigMushroom(0);
-        this.dirtGen = new WorldGenMinable(Blocks.dirt, 32);
-        this.gravelGen = new WorldGenMinable(Blocks.gravel, 32);
-        this.coalGen = new WorldGenMinable(Blocks.coal_ore, 16);
+        this.dirtGen = new WorldGenMinableUnderworld(Blocks.dirt, 32);
+        this.gravelGen = new WorldGenMinableUnderworld(Blocks.gravel, 32);
         //this.copperGen = new WorldGenMinable(Blocks.oreCopper, 6);
         //this.silverGen = new WorldGenMinable(Blocks.oreSilver, 6);
-        this.goldGen = new WorldGenMinable(Blocks.gold_ore, 4);
-        this.ironGen = new WorldGenMinable(Blocks.iron_ore, 6);
-        //this.mithrilGen = new WorldGenMinable(Blocks.oreMithril, 3);
-        //this.adamantiteGen = new WorldGenMinable(Blocks.oreAdamantium, 3);
-        this.redstoneGen = new WorldGenMinable(Blocks.redstone_ore, 5);
-        this.diamondGen = new WorldGenMinable(Blocks.diamond_ore, 3);
-        this.lapisGen = new WorldGenMinable(Blocks.lapis_ore, 3);
-        this.silverfishGen = new WorldGenMinable(Blocks.monster_egg, 3);
+        this.goldGen = new WorldGenMinableUnderworld(Blocks.gold_ore, 4, true);
+        this.ironGen = new WorldGenMinableUnderworld(Blocks.iron_ore, 6, true);
+        this.redstoneGen = new WorldGenMinableUnderworld(Blocks.redstone_ore, 5);
+        this.diamondGen = new WorldGenMinableUnderworld(Blocks.diamond_ore, 3);
+        this.lapisGen = new WorldGenMinableUnderworld(Blocks.lapis_ore, 3);
+        this.silverfishGen = new WorldGenMinableUnderworld(Blocks.monster_egg, 3);
     }
 
-    protected void genMinable(int frequency, WorldGenMinable world_gen_minable, boolean vein_size_increases_with_depth) {
+    public void genMinable(int frequency, WorldGenMinableUnderworld world_gen_minable) {
         while(frequency-- > 0) {
             if (this.randomGenerator.nextInt(10) == 0) {
                 int x = this.chunk_X + this.randomGenerator.nextInt(16);
-                int y = world_gen_minable.getRandomVeinHeight(this.currentWorld, this.randomGenerator);
+                int y = world_gen_minable.getRandomVeinHeight(currentWorld, randomGenerator);
                 int z = this.chunk_Z + this.randomGenerator.nextInt(16);
                 if (y >= 0) {
-                    world_gen_minable.generate(this.currentWorld, this.randomGenerator, x, y, z, vein_size_increases_with_depth);
+                    world_gen_minable.generate(this.currentWorld, this.randomGenerator, x, y, z);
                 }
             }
         }
-
     }
 
     @Override
@@ -61,8 +56,21 @@ public class UnderworldDecorator extends BiomeDecorator {
         }
     }
 
-    @Override
-    protected void genDecorations(BiomeGenBase biome) {
+    public void genDecorations(BiomeGenBase biome) {
+        this.generateOres();
+    }
 
+    public void generateOres() {
+        this.genMinable(300, (WorldGenMinableUnderworld) this.gravelGen);
+        //this.genMinable(40, this.copperGen, true);
+        //this.genMinable(10, this.silverGen, true);
+        this.genMinable(160, (WorldGenMinableUnderworld) this.goldGen);
+        this.genMinable(480, (WorldGenMinableUnderworld) this.ironGen);
+        //this.genMinable(10, this.mithrilGen, true);
+        //this.genMinable(5, this.adamantiteGen, true);
+        this.genMinable(80, (WorldGenMinableUnderworld) this.redstoneGen);
+        this.genMinable(40, (WorldGenMinableUnderworld) this.diamondGen);
+        this.genMinable(40, (WorldGenMinableUnderworld) this.lapisGen);
+        this.genMinable(400, (WorldGenMinableUnderworld) this.silverfishGen);
     }
 }

@@ -212,11 +212,13 @@ public class FixesUnderworld {
                                 c.storageArrays[var10] = new ExtendedBlockStorage(var10 << 4, !world.provider.hasNoSky);
                             }
                             c.storageArrays[var10].func_150818_a(var6, var8 & 0xF, var7, var9);
+                            /*
                             if (var9.getLightValue() > 0) {
                                 c.storageArrays[var10].setExtBlocklightValue(index, var8 & 15, var7, var9.getLightValue());
-                                //if (blocks[index + 1] == null)
-                                    //this.addPendingBlocklightUpdate(base_x + var6, var8, base_z + var7);
+                                if (blocks[index + 1] == null)
+                                    this.addPendingBlocklightUpdate(base_x + var6, var8, base_z + var7);
                             }
+                             */
                         }
                         var8 -= y_offset;
                     }
