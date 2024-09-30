@@ -1,20 +1,20 @@
 package mods.tesseract.underworld.biomes;
 
+import mods.tesseract.underworld.config.IConfigCSV;
 import mods.tesseract.underworld.world.WorldGenMinableUnderworld;
-import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeDecorator;
 import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.gen.feature.WorldGenBigMushroom;
-import net.minecraft.world.gen.feature.WorldGenerator;
 
 import java.util.Random;
 
 public class UnderworldDecorator extends BiomeDecorator {
-    private final WorldGenerator silverfishGen;
+    private final WorldGenMinableUnderworld[] oreGens;
 
     public UnderworldDecorator() {
         super();
+        this.oreGens = (WorldGenMinableUnderworld[]) IConfigCSV.parseCSV("aa", WorldGenMinableUnderworld.class);
+        /*
         this.bigMushroomGen = new WorldGenBigMushroom(0);
         this.dirtGen = new WorldGenMinableUnderworld(Blocks.dirt, 32);
         this.gravelGen = new WorldGenMinableUnderworld(Blocks.gravel, 32);
@@ -26,6 +26,8 @@ public class UnderworldDecorator extends BiomeDecorator {
         this.diamondGen = new WorldGenMinableUnderworld(Blocks.diamond_ore, 3);
         this.lapisGen = new WorldGenMinableUnderworld(Blocks.lapis_ore, 3);
         this.silverfishGen = new WorldGenMinableUnderworld(Blocks.monster_egg, 3);
+
+         */
     }
 
     public void genMinable(int frequency, WorldGenMinableUnderworld world_gen_minable) {
@@ -61,16 +63,18 @@ public class UnderworldDecorator extends BiomeDecorator {
     }
 
     public void generateOres() {
+        /*
         this.genMinable(300, (WorldGenMinableUnderworld) this.gravelGen);
-        //this.genMinable(40, this.copperGen, true);
-        //this.genMinable(10, this.silverGen, true);
+        this.genMinable(40, this.copperGen, true);
+        this.genMinable(10, this.silverGen, true);
         this.genMinable(160, (WorldGenMinableUnderworld) this.goldGen);
         this.genMinable(480, (WorldGenMinableUnderworld) this.ironGen);
-        //this.genMinable(10, this.mithrilGen, true);
-        //this.genMinable(5, this.adamantiteGen, true);
+        this.genMinable(10, this.mithrilGen, true);
+        this.genMinable(5, this.adamantiteGen, true);
         this.genMinable(80, (WorldGenMinableUnderworld) this.redstoneGen);
         this.genMinable(40, (WorldGenMinableUnderworld) this.diamondGen);
         this.genMinable(40, (WorldGenMinableUnderworld) this.lapisGen);
         this.genMinable(400, (WorldGenMinableUnderworld) this.silverfishGen);
+         */
     }
 }

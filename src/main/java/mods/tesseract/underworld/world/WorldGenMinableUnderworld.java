@@ -1,22 +1,51 @@
 package mods.tesseract.underworld.world;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+import mods.tesseract.underworld.config.IConfigCSV;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.gen.feature.WorldGenerator;
 
 import java.util.Random;
 
-public class WorldGenMinableUnderworld extends WorldGenerator {
+public class WorldGenMinableUnderworld extends WorldGenerator implements IConfigCSV {
+    public static final String[] types = {"oreDict", "block", "blockMeta", "veinSize", "minY", "maxY", "blockToReplace", "sizeIncreasesWithDepth"};
+    public String oreDict;
     public Block minableBlock;
     public int blockMetadata;
-    public int numberOfBlocks;
-    public int maxY;
+    public int veinSize;
     public int minY;
+    public int maxY;
     public Block blockToReplace;
     public boolean sizeIncreasesWithDepth;
 
+    @Override
+    public String[] getTypes() {
+        return types;
+    }
+
+    @Override
+    public String toCSV() {
+        return null;
+    }
+
+    @Override
+    public IConfigCSV parseCSV(String[] csv) {
+        this.oreDict = csv[0];
+        String[] b = IConfigCSV.split(csv[1], ':');
+        this.minableBlock = GameRegistry.findBlock(b[0], b[1]);
+        this.blockMetadata = Integer.parseInt(csv[2]);
+        this.veinSize = Integer.parseInt(csv[3]);
+        this.minY = Integer.parseInt(csv[4]);
+        this.maxY = Integer.parseInt(csv[5]);
+        b = IConfigCSV.split(csv[6], ':');
+        this.blockToReplace = GameRegistry.findBlock(b[0], b[1]);
+        this.sizeIncreasesWithDepth = Boolean.parseBoolean(csv[7]);
+        return this;
+    }
+
+    /*
     public WorldGenMinableUnderworld(Block block, int size, boolean increase) {
         this(block, 0, size, Blocks.stone, 255, 0, increase);
     }
@@ -28,25 +57,20 @@ public class WorldGenMinableUnderworld extends WorldGenerator {
     public WorldGenMinableUnderworld(Block block, int meta, int size, Block base, int max, int min, boolean increase) {
         this.minableBlock = block;
         this.blockMetadata = meta;
-        this.numberOfBlocks = size;
+        this.veinSize = size;
         this.blockToReplace = base;
         this.maxY = max;
         this.minY = min;
         this.sizeIncreasesWithDepth = increase;
     }
+*/
 
-    public int growVein(World world, Random rand, int blocks_to_grow, int x, int y, int z, boolean must_be_supported, boolean is_dirt) {
+    public int growVein(World world, Random rand, int blocks_to_grow, int x, int y, int z, boolean must_be_supported) {
         if (blocks_to_grow >= 1 && world.blockExists(x, y, z) && world.getBlock(x, y, z) == this.blockToReplace) {
             if (must_be_supported && (y < 1 || world.getBlock(x, y - 1, z).getMaterial().isReplaceable())) {
                 return 0;
             } else {
-                if (is_dirt && world.canBlockSeeTheSky(x, y + 1, z)) {
-                    BiomeGenBase biome = world.getBiomeGenForCoords(x, z);
-                    world.setBlock(x, y, z, biome != BiomeGenBase.desert && biome != BiomeGenBase.desertHills ? Blocks.grass : Blocks.sand, 0, 2);
-                } else {
                     world.setBlock(x, y, z, this.minableBlock, this.blockMetadata, 2);
-                }
-
                 int ore_blocks_grown = 1;
 
                 for (int attempts = 0; attempts < 16; ++attempts) {
@@ -62,7 +86,7 @@ public class WorldGenMinableUnderworld extends WorldGenerator {
                         dz = rand.nextInt(2) == 0 ? -1 : 1;
                     }
 
-                    ore_blocks_grown += this.growVein(world, rand, blocks_to_grow - ore_blocks_grown, x + dx, y + dy, z + dz, must_be_supported, is_dirt);
+                    ore_blocks_grown += this.growVein(world, rand, blocks_to_grow - ore_blocks_grown, x + dx, y + dy, z + dz, must_be_supported);
                     if (ore_blocks_grown == blocks_to_grow) {
                         break;
                     }
@@ -78,7 +102,7 @@ public class WorldGenMinableUnderworld extends WorldGenerator {
     @Override
     public boolean generate(World world, Random rand, int x, int y, int z) {
         if (world.blockExists(x, y, z) && world.getBlock(x, y, z) == this.blockToReplace) {
-            int vein_size = this.numberOfBlocks;
+            int vein_size = this.veinSize;
 
             float scale = 1.0F;
             while (rand.nextInt(2) == 0) {
@@ -120,8 +144,7 @@ public class WorldGenMinableUnderworld extends WorldGenerator {
                 }
 
                 boolean must_be_supported = this.minableBlock == Blocks.gravel;
-                boolean is_dirt = this.minableBlock == Blocks.dirt;
-                this.growVein(world, rand, vein_size, x, y, z, must_be_supported, is_dirt);
+                this.growVein(world, rand, vein_size, x, y, z, must_be_supported);
                 return true;
             }
         } else {
@@ -131,7 +154,7 @@ public class WorldGenMinableUnderworld extends WorldGenerator {
 
 
     public int getRandomVeinHeight(World world, Random rand) {
-        int y = minY + rand.nextInt(maxY);
-        return rand.nextFloat() < 0.75f ? y / 2 : y;
+        int y = rand.nextInt(maxY - minY);
+        return minY + rand.nextFloat() < 0.75f ? y / 2 : y;
     }
 }
