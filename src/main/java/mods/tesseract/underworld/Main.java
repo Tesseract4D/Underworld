@@ -8,7 +8,9 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import mods.tesseract.underworld.biomes.BiomeGenUnderworld;
 import mods.tesseract.underworld.blocks.BlockMantleOrCore;
 import mods.tesseract.underworld.blocks.ItemBlockMantleOrCore;
+import mods.tesseract.underworld.config.Config;
 import mods.tesseract.underworld.config.ConfigUnderworld;
+import mods.tesseract.underworld.config.IConfigProperties;
 import mods.tesseract.underworld.fix.ReplaceMethodVisitor;
 import mods.tesseract.underworld.world.WorldProviderUnderworld;
 import net.minecraft.block.Block;
@@ -29,17 +31,33 @@ import net.tclproject.mysteriumlib.asm.core.MiscUtils;
 public class Main extends CustomLoadingPlugin {
     public static int underworld_y_offset = 120;
     public static Block mantleOrCore;
-    public static ConfigUnderworld oreEntries = new ConfigUnderworld("OreEntries.txt", """
+    public static Config oreEntries = new Config("OreEntries.csv", """
         oreDict,block,blockMeta,veinSize,minY,maxY,blockToReplace,frequency,sizeIncreasesWithDepth
-        oreIron,minecraft:iron_ore,0,6,0,255,minecraft:stone,60,true""");
+        gravel,minecraft:gravel,0,32,0,255,minecraft:stone,300,false
+        infested,minecraft:monster_egg,0,3,0,255,minecraft:stone,400,false
+        oreIron,minecraft:iron_ore,0,6,0,255,minecraft:stone,480,true
+        #oreCopper,modid:blockid,0,6,0,255,minecraft:stone,320,true
+        oreGold,minecraft:gold_ore,0,4,0,255,minecraft:stone,160,true
+        #oreSilver,modid:blockid,0,6,0,255,minecraft:stone,80,true
+        #oreMithril,modid:blockid,0,3,0,255,minecraft:stone,80,true
+        oreRedstone,minecraft:redstone_ore,0,5,0,255,minecraft:stone,80,true
+        oreDiamond,minecraft:diamond_ore,0,3,0,255,minecraft:stone,40,true
+        oreLapis,minecraft:lapis_ore,0,3,0,255,minecraft:stone,40,true""");
+
+    public static Config config = new Config("Main.properties", IConfigProperties.toProperties(ConfigUnderworld.class));
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
-        oreEntries.init();
+        oreEntries.read();
+        config.read();
+        IConfigProperties.loadProperties(config.config, ConfigUnderworld.class);
+        config.config = IConfigProperties.toProperties(ConfigUnderworld.class);
+        config.save();
         try {
             System.out.println("&" + new MetaReader().getLocalVariables(EntityRenderer.class.getDeclaredMethod("updateFogColor", float.class)));
             System.out.println("&" + MiscUtils.getMemberInfo(EntityRenderer.class.getDeclaredMethod("getNightVisionBrightness", EntityPlayer.class, float.class)));
         } catch (Exception ex) {
         }
+        System.out.println(config.defaultConfig);
         BiomeGenUnderworld.biome = (new BiomeGenUnderworld(26)).setColor(16711680).setBiomeName("Underworld").setDisableRain().setTemperatureRainfall(1.0F, 0.0F);
         mantleOrCore = registerBlock(new BlockMantleOrCore().setBlockName("mantleOrCore"), ItemBlockMantleOrCore.class);
     }

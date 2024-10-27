@@ -27,11 +27,6 @@ public class WorldGenMinableUnderworld extends WorldGenerator implements IConfig
     }
 
     @Override
-    public String toCSV() {
-        return null;
-    }
-
-    @Override
     public IConfigCSV parseCSV(String[] csv) {
         this.oreDict = csv[0];
         String[] b = IConfigCSV.split(csv[1], ':');

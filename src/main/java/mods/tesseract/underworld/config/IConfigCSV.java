@@ -5,9 +5,6 @@ import java.util.Arrays;
 
 public interface IConfigCSV {
     String[] getTypes();
-
-    String toCSV();
-
     IConfigCSV parseCSV(String[] csv);
 
     static ArrayList<IConfigCSV> parseCSV(String csv, Class<? extends IConfigCSV> cls) throws IllegalArgumentException{
@@ -49,7 +46,7 @@ public interface IConfigCSV {
         b.delete(0, 1);
         str.append(b);
         for (IConfigCSV c : csv)
-            str.append("\n").append(c.toCSV());
+            str.append("\n").append(c.toString());
         return str.toString();
     }
 
