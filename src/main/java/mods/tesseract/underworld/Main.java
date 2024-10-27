@@ -8,10 +8,10 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import mods.tesseract.underworld.biomes.BiomeGenUnderworld;
 import mods.tesseract.underworld.blocks.BlockMantleOrCore;
 import mods.tesseract.underworld.blocks.ItemBlockMantleOrCore;
+import mods.tesseract.underworld.config.ConfigUnderworld;
 import mods.tesseract.underworld.fix.ReplaceMethodVisitor;
 import mods.tesseract.underworld.world.WorldProviderUnderworld;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockLiquid;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -29,8 +29,12 @@ import net.tclproject.mysteriumlib.asm.core.MiscUtils;
 public class Main extends CustomLoadingPlugin {
     public static int underworld_y_offset = 120;
     public static Block mantleOrCore;
+    public static ConfigUnderworld oreEntries = new ConfigUnderworld("OreEntries.txt", """
+        oreDict,block,blockMeta,veinSize,minY,maxY,blockToReplace,frequency,sizeIncreasesWithDepth
+        oreIron,minecraft:iron_ore,0,6,0,255,minecraft:stone,60,true""");
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
+        oreEntries.init();
         try {
             System.out.println("&" + new MetaReader().getLocalVariables(EntityRenderer.class.getDeclaredMethod("updateFogColor", float.class)));
             System.out.println("&" + MiscUtils.getMemberInfo(EntityRenderer.class.getDeclaredMethod("getNightVisionBrightness", EntityPlayer.class, float.class)));

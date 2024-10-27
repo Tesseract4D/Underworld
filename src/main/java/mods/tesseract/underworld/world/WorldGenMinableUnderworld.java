@@ -10,7 +10,7 @@ import net.minecraft.world.gen.feature.WorldGenerator;
 import java.util.Random;
 
 public class WorldGenMinableUnderworld extends WorldGenerator implements IConfigCSV {
-    public static final String[] types = {"oreDict", "block", "blockMeta", "veinSize", "minY", "maxY", "blockToReplace", "sizeIncreasesWithDepth"};
+    public static final String[] types = {"oreDict", "block", "blockMeta", "veinSize", "minY", "maxY", "blockToReplace","frequency", "sizeIncreasesWithDepth"};
     public String oreDict;
     public Block minableBlock;
     public int blockMetadata;
@@ -18,6 +18,7 @@ public class WorldGenMinableUnderworld extends WorldGenerator implements IConfig
     public int minY;
     public int maxY;
     public Block blockToReplace;
+    public int frequency;
     public boolean sizeIncreasesWithDepth;
 
     @Override
@@ -41,7 +42,8 @@ public class WorldGenMinableUnderworld extends WorldGenerator implements IConfig
         this.maxY = Integer.parseInt(csv[5]);
         b = IConfigCSV.split(csv[6], ':');
         this.blockToReplace = GameRegistry.findBlock(b[0], b[1]);
-        this.sizeIncreasesWithDepth = Boolean.parseBoolean(csv[7]);
+        this.frequency = Integer.parseInt(csv[7]);
+        this.sizeIncreasesWithDepth = Boolean.parseBoolean(csv[8]);
         return this;
     }
 

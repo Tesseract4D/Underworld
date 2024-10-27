@@ -10,11 +10,11 @@ public interface IConfigCSV {
 
     IConfigCSV parseCSV(String[] csv);
 
-    static IConfigCSV[] parseCSV(String csv, Class<? extends IConfigCSV> cls) {
+    static ArrayList<IConfigCSV> parseCSV(String csv, Class<? extends IConfigCSV> cls) throws IllegalArgumentException{
         ArrayList<IConfigCSV> list = new ArrayList<>();
         String[] l = split2(csv, '\n');
         if (l.length < 2)
-            return new IConfigCSV[0];
+            return list;
         try {
             String[] n = cls.newInstance().getTypes();
             StringBuilder b = new StringBuilder();
@@ -22,20 +22,20 @@ public interface IConfigCSV {
                 b.append(",").append(s);
             b.delete(0, 1);
             if (!l[0].contentEquals(b))
-                throw new RuntimeException("不匹配的类型！应为：" + b + " 实为：" + l[0]);
+                throw new IllegalArgumentException("不匹配的类型！应为：" + b + " 实为：" + l[0]);
             for (int i = 1; i < l.length; i++) {
                 String t = l[i];
                 String[] s = split(t, ',');
                 if (s.length != n.length)
-                    throw new RuntimeException("不匹配的值数！应为：" + n.length + " 实为：" + s.length + " " + Arrays.toString(s));
+                    throw new IllegalArgumentException("不匹配的值数！应为：" + n.length + " 实为：" + s.length + " " + Arrays.toString(s));
                 IConfigCSV c = cls.newInstance();
                 c.parseCSV(s);
                 list.add(c);
             }
-        } catch (Exception e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
-        return list.toArray(new IConfigCSV[0]);
+        return list;
     }
 
     static String toCSV(IConfigCSV[] csv, Class<? extends IConfigCSV> cls) {
