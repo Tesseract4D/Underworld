@@ -19,7 +19,6 @@ import mods.tesseract.underworld.world.WorldProviderUnderworld;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.common.DimensionManager;
@@ -29,6 +28,8 @@ import net.tclproject.mysteriumlib.asm.common.CustomLoadingPlugin;
 import net.tclproject.mysteriumlib.asm.common.FirstClassTransformer;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.ListIterator;
 
 @Mod(modid = "underworld", acceptedMinecraftVersions = "[1.7.10]")
 public class Main extends CustomLoadingPlugin {
@@ -39,6 +40,35 @@ public class Main extends CustomLoadingPlugin {
     public static Config config = new Config("Main.properties", IConfigProperties.toProperties(ConfigUnderworld.class));
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
+        Main.oreEntries = new Config("OreEntries.csv", """
+            #oreDict，矿物词典，当找不到对应的方块时将选取该矿物词典中第一个方块来生成
+            #block，要生成的方块
+            #blockMeta，要生成的方块的元数据值
+            #veinSize，矿脉最大尺寸
+            #minY，生成的最低高度
+            #maxY，生成的最高高度
+            #blockToReplace，要替换的方块，一般为石头
+            #frequency，一个区块尝试生成的次数，越大生成得越多
+            #uniformDistribution，是否平均分布，否则75%的矿脉会生成在最低高度到最高高度之间的下半部分
+            #sizeIncreasesWithDepth，矿脉尺寸是否随深度而增加
+
+            oreDict,block,blockMeta,veinSize,minY,maxY,blockToReplace,frequency,uniformDistribution,sizeIncreasesWithDepth
+            gravel,minecraft:gravel,0,32,0,255,minecraft:stone,30,true,false
+            infested,minecraft:monster_egg,0,3,0,255,minecraft:stone,40,true,false
+            oreIron,minecraft:iron_ore,0,6,0,255,minecraft:stone,48,false,true
+            #默认不生成煤矿
+            #oreCoal,minecraft:coal_ore,0,16,0,255,minecraft:stone,40,false,true
+            oreGold,minecraft:gold_ore,0,4,0,255,minecraft:stone,16,false,true
+            oreRedstone,minecraft:redstone_ore,0,5,0,255,minecraft:stone,8,false,true
+            oreDiamond,minecraft:diamond_ore,0,3,0,255,minecraft:stone,4,false,true
+            oreLapis,minecraft:lapis_ore,0,3,0,255,minecraft:stone,4,false,true
+            #如果找不到对应的方块，将会尝试从矿物词典中查找方块，如果仍没有则该条将被忽略
+            oreAdamatnium,modid:blockid,0,3,0,127,minecraft:stone,1,true,true
+            oreDebris,modid:blockid,0,3,0,127,minecraft:stone,1,true,true
+            oreCopper,modid:blockid,0,6,0,255,minecraft:stone,32,false,true
+            oreSilver,modid:blockid,0,6,0,255,minecraft:stone,8,false,true
+            oreMithril,modid:blockid,0,3,0,255,minecraft:stone,8,false,true""");
+        Main.oreEntries.read();
         config.read();
         IConfigProperties.loadProperties(config.config, ConfigUnderworld.class);
         config.config = IConfigProperties.toProperties(ConfigUnderworld.class);
@@ -55,36 +85,7 @@ public class Main extends CustomLoadingPlugin {
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent e) {
-        String s = "";
-        ArrayList<ItemStack> od = OreDictionary.getOres("oreCopper");
-        if (!od.isEmpty())
-            s += "oreCopper," + od.get(0).getUnlocalizedName() + "," + od.get(0).getItemDamage() + ",6,0,255,minecraft:stone,32,true\n";
-        oreEntries = new Config("OreEntries.csv", s + """
-            oreDict,block,blockMeta,veinSize,minY,maxY,blockToReplace,frequency,sizeIncreasesWithDepth
-            gravel,minecraft:gravel,0,32,0,255,minecraft:stone,30,false
-            infested,minecraft:monster_egg,0,3,0,255,minecraft:stone,40,false
-            oreIron,minecraft:iron_ore,0,6,0,255,minecraft:stone,48,true
-            oreGold,minecraft:gold_ore,0,4,0,255,minecraft:stone,16,true
-            #oreSilver,modid:blockid,0,6,0,255,minecraft:stone,8,true
-            #oreMithril,modid:blockid,0,3,0,255,minecraft:stone,8,true
-            oreRedstone,minecraft:redstone_ore,0,5,0,255,minecraft:stone,8,true
-            oreDiamond,minecraft:diamond_ore,0,3,0,255,minecraft:stone,4,true
-            oreLapis,minecraft:lapis_ore,0,3,0,255,minecraft:stone,4,true""");
-        oreEntries.read();
-        ArrayList<IConfigCSV> ores;
-        try {
-            ores = IConfigCSV.parseCSV(Main.oreEntries.config, WorldGenMinableUnderworld.class);
-        } catch (IllegalArgumentException f) {
-            Main.oreEntries.reset();
-            ores = IConfigCSV.parseCSV(Main.oreEntries.defaultConfig, WorldGenMinableUnderworld.class);
-        }
-        BiomeGenUnderworld.decorator.oreGens = ores.toArray(new WorldGenMinableUnderworld[0]);
-        for (WorldGenMinableUnderworld g : BiomeGenUnderworld.decorator.oreGens) {
-            if (!g.oreDict.equals("gravel"))
-                g.frequency = (int) (g.frequency * ConfigUnderworld.ore_mutiplier);
-        }
-        System.out.println(7777);
-        System.out.println(BiomeGenUnderworld.decorator.oreGens[0].minableBlock.getUnlocalizedName());
+
     }
 
     @SubscribeEvent

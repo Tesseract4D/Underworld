@@ -1,17 +1,20 @@
 package mods.tesseract.underworld.world;
 
-import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;
 import mods.tesseract.underworld.config.IConfigCSV;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
+import net.minecraftforge.oredict.OreDictionary;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class WorldGenMinableUnderworld extends WorldGenerator implements IConfigCSV {
-    public static final String[] types = {"oreDict", "block", "blockMeta", "veinSize", "minY", "maxY", "blockToReplace","frequency", "sizeIncreasesWithDepth"};
+    public static final String[] types = {"oreDict", "block", "blockMeta", "veinSize", "minY", "maxY", "blockToReplace", "frequency", "uniformDistribution", "sizeIncreasesWithDepth"};
     public String oreDict;
     public Block minableBlock;
     public int blockMetadata;
@@ -20,6 +23,7 @@ public class WorldGenMinableUnderworld extends WorldGenerator implements IConfig
     public int maxY;
     public Block blockToReplace;
     public int frequency;
+    public boolean uniformDistribution;
     public boolean sizeIncreasesWithDepth;
 
     @Override
@@ -33,13 +37,24 @@ public class WorldGenMinableUnderworld extends WorldGenerator implements IConfig
         String[] b = IConfigCSV.split(csv[1], ':');
         this.minableBlock = GameRegistry.findBlock(b[0], b[1]);
         this.blockMetadata = Integer.parseInt(csv[2]);
+        if (minableBlock == null) {
+            ArrayList<ItemStack> o = OreDictionary.getOres(oreDict);
+            for (ItemStack k : o) {
+                if (k.getItem() instanceof ItemBlock l) {
+                    this.minableBlock = l.field_150939_a;
+                    this.blockMetadata = k.getItemDamage();
+                    break;
+                }
+            }
+        }
         this.veinSize = Integer.parseInt(csv[3]);
         this.minY = Integer.parseInt(csv[4]);
         this.maxY = Integer.parseInt(csv[5]);
         b = IConfigCSV.split(csv[6], ':');
         this.blockToReplace = GameRegistry.findBlock(b[0], b[1]);
         this.frequency = Integer.parseInt(csv[7]);
-        this.sizeIncreasesWithDepth = Boolean.parseBoolean(csv[8]);
+        this.uniformDistribution = Boolean.parseBoolean(csv[8]);
+        this.sizeIncreasesWithDepth = Boolean.parseBoolean(csv[9]);
         return this;
     }
 
@@ -133,6 +148,6 @@ public class WorldGenMinableUnderworld extends WorldGenerator implements IConfig
 
     public int getRandomVeinHeight(World world, Random rand) {
         int y = rand.nextInt(maxY - minY);
-        return minY + rand.nextFloat() < 0.75f ? y / 2 : y;
+        return minY + (uniformDistribution || rand.nextFloat() > 0.75f ? y : y / 2);
     }
 }

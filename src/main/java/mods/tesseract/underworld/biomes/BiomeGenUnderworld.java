@@ -7,6 +7,7 @@ import mods.tesseract.underworld.util.ChunkPostField;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockMushroom;
 import net.minecraft.entity.monster.EntityCaveSpider;
+import net.minecraft.entity.monster.EntitySlime;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeDecorator;
@@ -17,15 +18,15 @@ import java.util.Random;
 
 public class BiomeGenUnderworld extends BiomeGenBase {
     public static BiomeGenBase biome;
-    public static UnderworldDecorator decorator = new UnderworldDecorator();
     public BiomeGenUnderworld(int id) {
         super(id);
         this.spawnableMonsterList.add(new SpawnListEntry(EntityCaveSpider.class, 40, 1, 2));
+        this.spawnableMonsterList.add(new SpawnListEntry(EntitySlime.class, 10, 1, 2));
     }
 
     @Override
     public BiomeDecorator createBiomeDecorator() {
-        return decorator;
+        return new UnderworldDecorator();
     }
 
     public void decorate(World world, Random random, int chunk_origin_x, int chunk_origin_z) {
