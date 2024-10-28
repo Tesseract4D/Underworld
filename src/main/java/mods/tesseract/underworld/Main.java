@@ -64,8 +64,14 @@ public class Main extends CustomLoadingPlugin {
             oreLapis,minecraft:lapis_ore,0,3,0,255,minecraft:stone,4,false,true
             #如果找不到对应的方块，将会尝试从矿物词典中查找方块，如果仍没有则该条将被忽略
             oreAdamatnium,modid:blockid,0,3,0,127,minecraft:stone,1,true,true
+            orePlatinum,modid:blockid,0,3,0,127,minecraft:stone,1,true,true
+            oreIridium,modid:blockid,0,3,0,127,minecraft:stone,1,true,true
             oreDebris,modid:blockid,0,3,0,127,minecraft:stone,1,true,true
             oreCopper,modid:blockid,0,6,0,255,minecraft:stone,32,false,true
+            oreTin,modid:blockid,0,6,0,255,minecraft:stone,16,false,true
+            oreLead,modid:blockid,0,6,0,255,minecraft:stone,10,false,true
+            oreNickel,modid:blockid,0,4,0,255,minecraft:stone,4,false,true
+            oreAluminum,modid:blockid,0,6,0,255,minecraft:stone,16,false,true
             oreSilver,modid:blockid,0,6,0,255,minecraft:stone,8,false,true
             oreMithril,modid:blockid,0,3,0,255,minecraft:stone,8,false,true""");
         Main.oreEntries.read();
