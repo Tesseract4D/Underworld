@@ -1,5 +1,6 @@
 package mods.tesseract.underworld.world;
 
+import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;
 import mods.tesseract.underworld.config.IConfigCSV;
 import net.minecraft.block.Block;
@@ -41,26 +42,6 @@ public class WorldGenMinableUnderworld extends WorldGenerator implements IConfig
         this.sizeIncreasesWithDepth = Boolean.parseBoolean(csv[8]);
         return this;
     }
-
-    /*
-    public WorldGenMinableUnderworld(Block block, int size, boolean increase) {
-        this(block, 0, size, Blocks.stone, 255, 0, increase);
-    }
-
-    public WorldGenMinableUnderworld(Block block, int size) {
-        this(block, size, false);
-    }
-
-    public WorldGenMinableUnderworld(Block block, int meta, int size, Block base, int max, int min, boolean increase) {
-        this.minableBlock = block;
-        this.blockMetadata = meta;
-        this.veinSize = size;
-        this.blockToReplace = base;
-        this.maxY = max;
-        this.minY = min;
-        this.sizeIncreasesWithDepth = increase;
-    }
-*/
 
     public int growVein(World world, Random rand, int blocks_to_grow, int x, int y, int z, boolean must_be_supported) {
         if (blocks_to_grow >= 1 && world.blockExists(x, y, z) && world.getBlock(x, y, z) == this.blockToReplace) {

@@ -17,6 +17,7 @@ import java.util.Random;
 
 public class BiomeGenUnderworld extends BiomeGenBase {
     public static BiomeGenBase biome;
+    public static UnderworldDecorator decorator = new UnderworldDecorator();
     public BiomeGenUnderworld(int id) {
         super(id);
         this.spawnableMonsterList.add(new SpawnListEntry(EntityCaveSpider.class, 40, 1, 2));
@@ -24,7 +25,7 @@ public class BiomeGenUnderworld extends BiomeGenBase {
 
     @Override
     public BiomeDecorator createBiomeDecorator() {
-        return new UnderworldDecorator();
+        return decorator;
     }
 
     public void decorate(World world, Random random, int chunk_origin_x, int chunk_origin_z) {
@@ -39,7 +40,6 @@ public class BiomeGenUnderworld extends BiomeGenBase {
         for (int x = chunk_origin_x; x < chunk_origin_x + 16; ++x) {
             for (int z = chunk_origin_z; z < chunk_origin_z + 16; ++z) {
                 List posts = mycelium_posts.getNearbyPostsForBlockCoords(x, z);
-
                 for (int i = 0; i < posts.size(); ++i) {
                     ChunkPost post = (ChunkPost) posts.get(i);
                     if (!(post.getDistanceSqFromBlockCoords(x, z) > (double) (mycelium_posts.getPostMaxRadiusOfEffectSq() + 4))) {
@@ -65,7 +65,6 @@ public class BiomeGenUnderworld extends BiomeGenBase {
                                 }
                                 break;
                             }
-
                             ++y;
                         }
                     }
