@@ -4,10 +4,12 @@ import mods.tesseract.underworld.Main;
 import mods.tesseract.underworld.config.ConfigUnderworld;
 import mods.tesseract.underworld.config.IConfigCSV;
 import mods.tesseract.underworld.world.WorldGenMinableUnderworld;
+import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeDecorator;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.gen.feature.WorldGenBigMushroom;
+import net.minecraft.world.gen.feature.WorldGenLiquids;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
@@ -38,6 +40,19 @@ public class UnderworldDecorator extends BiomeDecorator {
     }
 
     public void genDecorations(BiomeGenBase biome) {
+        for (int j = 0; j < 25; ++j) {
+            int k = this.chunk_X + this.randomGenerator.nextInt(16) + 8;
+            int l = this.randomGenerator.nextInt(this.randomGenerator.nextInt(248) + 8);
+            int i1 = this.chunk_Z + this.randomGenerator.nextInt(16) + 8;
+            (new WorldGenLiquids(Blocks.flowing_water)).generate(this.currentWorld, this.randomGenerator, k, l+ Main.underworld_y_offset, i1);
+        }
+
+        for (int j = 0; j < 10; ++j) {
+            int k = this.chunk_X + this.randomGenerator.nextInt(16) + 8;
+            int l = this.randomGenerator.nextInt(this.randomGenerator.nextInt(this.randomGenerator.nextInt(240) + 8) + 8);
+            int i1 = this.chunk_Z + this.randomGenerator.nextInt(16) + 8;
+            (new WorldGenLiquids(Blocks.flowing_lava)).generate(this.currentWorld, this.randomGenerator, k, l + Main.underworld_y_offset, i1);
+        }
         this.generateOres();
     }
 

@@ -3,6 +3,7 @@ package mods.tesseract.underworld.fix;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import mods.tesseract.underworld.Main;
+import mods.tesseract.underworld.config.ConfigUnderworld;
 import mods.tesseract.underworld.util.ChunkPostField;
 import mods.tesseract.underworld.util.RNG;
 import mods.tesseract.underworld.world.ChunkProviderUnderworld;
@@ -86,7 +87,8 @@ public class FixesUnderworld {
 
     @Fix(insertOnExit = true)
     public static void applyEntityAttributes(EntitySkeleton c) {
-        c.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(5);
+        if (ConfigUnderworld.nerf_skeletons)
+            c.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(5);
     }
 
     @Fix(targetMethod = "<init>", insertOnLine = 1, returnSetting = EnumReturnSetting.ON_TRUE, nullReturned = true)
