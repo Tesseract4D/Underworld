@@ -1,48 +1,30 @@
-package mods.tesseract.underworld.fix;
+package cn.tesseract.underworld.hook;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import mods.tesseract.underworld.Main;
-import mods.tesseract.underworld.config.ConfigUnderworld;
-import mods.tesseract.underworld.util.ChunkPostField;
-import mods.tesseract.underworld.util.RNG;
-import mods.tesseract.underworld.world.ChunkProviderUnderworld;
+import cn.tesseract.mycelium.asm.Hook;
+import cn.tesseract.mycelium.asm.ReturnCondition;
+import cn.tesseract.underworld.Main;
+import cn.tesseract.underworld.util.ChunkPostField;
+import cn.tesseract.underworld.util.RNG;
+import cn.tesseract.underworld.world.ChunkProviderUnderworld;
+import cn.tesseract.underworld.world.WorldUnderworld;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
-import net.minecraftforge.common.DimensionManager;
-import net.tclproject.mysteriumlib.asm.annotations.EnumReturnSetting;
-import net.tclproject.mysteriumlib.asm.annotations.Fix;
-import net.tclproject.mysteriumlib.asm.annotations.ReturnedValue;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Random;
 
 @SuppressWarnings("unused")
-public class FixesUnderworld {
-    @Fix
-    public static void setWorld(DimensionManager c, int id, WorldServer world) {
-        ((IWorld) world).rng.init(world);
-        if (id == -2 && world != null) {
-            Random rand = new Random(world.getSeed());
-            rand.nextInt();
-            ((IWorld) world).mycelium_posts.setHashedWorldSeed(rand.nextLong());
-        }
-    }
-
-    @Fix(returnSetting = EnumReturnSetting.ON_TRUE, nullReturned = true)
-    @SideOnly(Side.CLIENT)
+public class UnderworldHook {
+    @Hook(returnCondition = ReturnCondition.ON_TRUE, returnNull = true)
     public static boolean renderVignette(GuiIngame c, float x, int y, int z) {
         if (c.mc.theWorld.provider.dimensionId == -2) {
             GL11.glDepthMask(true);
@@ -54,14 +36,8 @@ public class FixesUnderworld {
         return false;
     }
 
-    @Fix(createNewMethod = true)
-    public static float getFogNightVisionBrightness(EntityRenderer c, EntityPlayer player, float d) {
-        return player.worldObj.provider.dimensionId == -2 ? 0 : c.getNightVisionBrightness(player, d);
-    }
-
-
-    @Fix(insertOnExit = true, returnSetting = EnumReturnSetting.ALWAYS)
-    public static boolean handleLavaMovement(Entity c, @ReturnedValue boolean b) {
+    @Hook(injectOnExit = true, returnCondition = ReturnCondition.ALWAYS)
+    public static boolean handleLavaMovement(Entity c, @Hook.ReturnValue boolean b) {
         return b || doesBoundingBoxContainBlock(c.worldObj, c.boundingBox.expand(0.001, 0.001, 0.001), Main.mantleOrCore);
     }
 
@@ -85,19 +61,13 @@ public class FixesUnderworld {
         return false;
     }
 
-    @Fix(insertOnExit = true)
-    public static void applyEntityAttributes(EntitySkeleton c) {
-        if (ConfigUnderworld.nerf_skeletons)
-            c.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(5);
-    }
-
-    @Fix(targetMethod = "<init>", insertOnLine = 1, returnSetting = EnumReturnSetting.ON_TRUE, nullReturned = true)
+    @Hook(targetMethod = "<init>", injectOnLine = 1, returnCondition = ReturnCondition.ON_TRUE, returnNull = true)
     public static boolean Chunk(Chunk c, World world, Block[] blocks, int cx, int xz) {
         int maxY = blocks.length / 256;
         int base_x = c.xPosition << 4;
         int base_z = c.zPosition << 4;
         if (world.provider.dimensionId == -2) {
-            RNG rng = ((IWorld) world).rng;
+            RNG rng = WorldUnderworld.get(world).rng;
             Random random = new Random(world.getSeed() * (long) ChunkPostField.getIntPairHash(c.xPosition, c.zPosition));
             int y_offset = Main.underworld_y_offset;
             double scale_xz = 0.015625;

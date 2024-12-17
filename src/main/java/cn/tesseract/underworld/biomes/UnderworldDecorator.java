@@ -1,18 +1,21 @@
-package mods.tesseract.underworld.biomes;
+package cn.tesseract.underworld.biomes;
 
-import mods.tesseract.underworld.Main;
-import mods.tesseract.underworld.config.ConfigUnderworld;
-import mods.tesseract.underworld.config.IConfigCSV;
-import mods.tesseract.underworld.world.WorldGenMinableUnderworld;
+import cn.tesseract.underworld.Main;
+import cn.tesseract.underworld.config.ConfigUnderWorld;
+import cn.tesseract.underworld.world.WorldGenMinableUnderworld;
+import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeDecorator;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.gen.feature.WorldGenBigMushroom;
 import net.minecraft.world.gen.feature.WorldGenLiquids;
+import net.minecraftforge.oredict.OreDictionary;
 
 import java.util.ArrayList;
-import java.util.ListIterator;
 import java.util.Random;
 
 public class UnderworldDecorator extends BiomeDecorator {
@@ -44,7 +47,7 @@ public class UnderworldDecorator extends BiomeDecorator {
             int k = this.chunk_X + this.randomGenerator.nextInt(16) + 8;
             int l = this.randomGenerator.nextInt(this.randomGenerator.nextInt(248) + 8);
             int i1 = this.chunk_Z + this.randomGenerator.nextInt(16) + 8;
-            (new WorldGenLiquids(Blocks.flowing_water)).generate(this.currentWorld, this.randomGenerator, k, l+ Main.underworld_y_offset, i1);
+            (new WorldGenLiquids(Blocks.flowing_water)).generate(this.currentWorld, this.randomGenerator, k, l + Main.underworld_y_offset, i1);
         }
 
         for (int j = 0; j < 10; ++j) {
@@ -59,24 +62,35 @@ public class UnderworldDecorator extends BiomeDecorator {
     public void generateOres() {
         if (!initialized) {
             initialized = true;
-            ArrayList<IConfigCSV> ores;
-            try {
-                ores = IConfigCSV.parseCSV(Main.oreEntries.config, WorldGenMinableUnderworld.class);
-            } catch (IllegalArgumentException f) {
-                Main.oreEntries.reset();
-                ores = IConfigCSV.parseCSV(Main.oreEntries.defaultConfig, WorldGenMinableUnderworld.class);
-            }
-            ListIterator<IConfigCSV> t = ores.listIterator();
-            while (t.hasNext()) {
-                WorldGenMinableUnderworld g = (WorldGenMinableUnderworld) t.next();
-                if (!g.oreDict.equals("gravel"))
-                    g.frequency = (int) (g.frequency * ConfigUnderworld.ore_mutiplier);
-                if (g.minableBlock == null || g.blockToReplace == null) {
-                    t.remove();
+            ArrayList<WorldGenMinableUnderworld> ores = new ArrayList<>();
+            Main.oreEntries.forEach(a -> {
+                if (a.disable)
+                    return;
+                String[] b = a.block.split(":");
+                Block block = GameRegistry.findBlock(b[0], b[1]);
+                int meta = a.blockMeta;
+                if (block == null) {
+                    ArrayList<ItemStack> o = OreDictionary.getOres(a.oreDict);
+                    for (ItemStack k : o) {
+                        if (k.getItem() instanceof ItemBlock l) {
+                            block = l.field_150939_a;
+                            meta = k.getItemDamage();
+                            break;
+                        }
+                    }
                 }
-            }
+                if (block == null)
+                    return;
+                b = a.blockToReplace.split(":");
+                Block replace = GameRegistry.findBlock(b[0], b[1]);
+                if (replace == null)
+                    replace = Blocks.stone;
+                ores.add(new WorldGenMinableUnderworld(block, meta, replace, a.veinSize, a.minY, a.maxY, a.oreDict.equals("gravel") ? a.frequency : (int) (a.frequency * ConfigUnderWorld.ore_mutiplier), a.uniformDistribution, a.sizeIncreasesWithDepth));
+            });
             oreGens = ores.toArray(new WorldGenMinableUnderworld[0]);
+            Main.oreEntries = null;
         }
+
         for (WorldGenMinableUnderworld g : oreGens) {
             int f = g.frequency;
             while (f-- > 0) {

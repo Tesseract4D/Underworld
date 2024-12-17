@@ -1,9 +1,9 @@
-package mods.tesseract.underworld.world;
+package cn.tesseract.underworld.world;
 
 
+import cn.tesseract.underworld.biomes.BiomeGenUnderworld;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import mods.tesseract.underworld.biomes.BiomeGenUnderworld;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.biome.WorldChunkManagerHell;

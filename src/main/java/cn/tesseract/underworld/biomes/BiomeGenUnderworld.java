@@ -1,9 +1,9 @@
-package mods.tesseract.underworld.biomes;
+package cn.tesseract.underworld.biomes;
 
-import mods.tesseract.underworld.Main;
-import mods.tesseract.underworld.fix.IWorld;
-import mods.tesseract.underworld.util.ChunkPost;
-import mods.tesseract.underworld.util.ChunkPostField;
+import cn.tesseract.underworld.Main;
+import cn.tesseract.underworld.world.WorldUnderworld;
+import cn.tesseract.underworld.util.ChunkPost;
+import cn.tesseract.underworld.util.ChunkPostField;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockMushroom;
 import net.minecraft.entity.monster.EntityCaveSpider;
@@ -18,6 +18,7 @@ import java.util.Random;
 
 public class BiomeGenUnderworld extends BiomeGenBase {
     public static BiomeGenBase biome;
+
     public BiomeGenUnderworld(int id) {
         super(id);
         this.spawnableMonsterList.add(new SpawnListEntry(EntityCaveSpider.class, 40, 1, 2));
@@ -35,7 +36,7 @@ public class BiomeGenUnderworld extends BiomeGenBase {
     }
 
     private void placeMycelium(World world, int chunk_origin_x, int chunk_origin_z) {
-        ChunkPostField mycelium_posts = ((IWorld) world).mycelium_posts;
+        ChunkPostField mycelium_posts = WorldUnderworld.get(world).mycelium_posts;
         Random random = new Random();
 
         for (int x = chunk_origin_x; x < chunk_origin_x + 16; ++x) {
