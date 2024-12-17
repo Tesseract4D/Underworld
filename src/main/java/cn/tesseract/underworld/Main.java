@@ -120,7 +120,6 @@ public class Main extends HookLoader {
     @Override
     protected void registerHooks() {
         registerHookContainer("cn.tesseract.underworld.hook.UnderworldHook");
-        registerHookContainer("cn.tesseract.underworld.hook.EntityRendererHook");
         registerNodeTransformer("net.minecraft.client.renderer.EntityRenderer", new NodeTransformer() {
             @Override
             public void transform(ClassNode node) {
@@ -131,6 +130,21 @@ public class Main extends HookLoader {
                             if (insn instanceof MethodInsnNode minsn)
                                 if (HookLibPlugin.getMethodMcpName(minsn.name).equals("getNightVisionBrightness")) {
                                     minsn.name = "getFogNightVisionBrightness";
+                                }
+                        }
+                }
+            }
+        });
+        registerNodeTransformer("net.minecraft.entity.Entity", new NodeTransformer() {
+            @Override
+            public void transform(ClassNode node) {
+                for (MethodNode method : node.methods) {
+                    if (HookLibPlugin.getMethodMcpName(method.name).equals("onEntityUpdate"))
+                        for (int i = 0; i < method.instructions.size(); i++) {
+                            AbstractInsnNode insn = method.instructions.get(i);
+                            if (insn instanceof MethodInsnNode minsn)
+                                if (HookLibPlugin.getMethodMcpName(minsn.name).equals("travelToDimension")) {
+                                    minsn.name = "travelToDimensionUnderworld";
                                 }
                         }
                 }

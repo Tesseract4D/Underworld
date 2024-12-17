@@ -24,6 +24,19 @@ import java.util.Random;
 
 @SuppressWarnings("unused")
 public class UnderworldHook {
+    @Hook(createMethod = true)
+    public static float getFogNightVisionBrightness(EntityRenderer c, EntityPlayer player, float d) {
+        return player.worldObj.provider.dimensionId == -2 ? 0 : c.getNightVisionBrightness(player, d);
+    }
+
+    @Hook(createMethod = true)
+    public static void travelToDimensionUnderworld(Entity c, int dimensionId) {
+        if (c.worldObj.provider.dimensionId == 0)
+            c.travelToDimension(-2);
+        else
+            c.travelToDimension(dimensionId);
+    }
+
     @Hook(returnCondition = ReturnCondition.ON_TRUE, returnNull = true)
     public static boolean renderVignette(GuiIngame c, float x, int y, int z) {
         if (c.mc.theWorld.provider.dimensionId == -2) {

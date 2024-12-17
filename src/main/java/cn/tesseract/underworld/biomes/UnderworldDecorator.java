@@ -79,8 +79,10 @@ public class UnderworldDecorator extends BiomeDecorator {
                         }
                     }
                 }
-                if (block == null)
+                if (block == null) {
+                    System.out.println("[Warning] Cannot find block for \"" + a.file.getName() + "\", ignored.");
                     return;
+                }
                 b = a.blockToReplace.split(":");
                 Block replace = GameRegistry.findBlock(b[0], b[1]);
                 if (replace == null)
