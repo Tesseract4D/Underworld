@@ -13,7 +13,7 @@ public class ChunkPostField {
     private final Random random;
     private final int type;
     private final long hashed_type;
-    private long hashed_world_seed;
+    private final long hashed_world_seed;
     private final int post_max_radius_of_effect;
     private final int post_max_radius_of_effect_sq;
     private final int field_chunk_range;
@@ -24,21 +24,18 @@ public class ChunkPostField {
     private int last_post_field_generation_origin_chunk_z;
     private List post_list;
 
-    public ChunkPostField(int type, int post_max_radius_of_effect, float chance_of_post_per_chunk) {
+    public ChunkPostField(int type,long hashed_world_seed, int post_max_radius_of_effect, float chance_of_post_per_chunk) {
         this.random = new Random(type);
         this.type = type;
         this.random.nextInt();
         this.hashed_type = this.random.nextLong();
+        this.hashed_world_seed = hashed_world_seed;
         this.post_max_radius_of_effect = post_max_radius_of_effect;
         this.post_max_radius_of_effect_sq = post_max_radius_of_effect * post_max_radius_of_effect;
         this.field_chunk_range = post_max_radius_of_effect < 1 ? 0 : (post_max_radius_of_effect - 1) / 16 + 1;
         this.field_size_in_chunks = this.field_chunk_range * 2 + 1;
         this.field_num_chunks = this.field_size_in_chunks * this.field_size_in_chunks;
         this.chance_of_post_per_chunk = chance_of_post_per_chunk;
-    }
-
-    public void setHashedWorldSeed(long hashed_world_seed){
-        this.hashed_world_seed = hashed_world_seed;
     }
 
     private boolean doesPostFieldRequireRegeneration(int chunk_x, int chunk_z) {

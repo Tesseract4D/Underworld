@@ -2,6 +2,7 @@ package cn.tesseract.underworld;
 
 import cn.tesseract.underworld.biome.BiomeGenUnderworld;
 import cn.tesseract.underworld.block.BlockMantleOrCore;
+import cn.tesseract.underworld.block.BlockRunestone;
 import cn.tesseract.underworld.block.ItemBlockMantleOrCore;
 import cn.tesseract.underworld.config.ConfigOreEntry;
 import cn.tesseract.underworld.config.ConfigUnderWorld;
@@ -28,6 +29,8 @@ import java.util.ArrayList;
 public class Underworld {
     public static int underworld_y_offset = 120;
     public static Block mantleOrCore;
+    public static BlockRunestone runestoneMithril;
+    public static BlockRunestone runestoneAdamantium;
     public static ArrayList<ConfigOreEntry> oreEntries = new ArrayList<>();
 
     public static ConfigUnderWorld config = new ConfigUnderWorld();
@@ -77,6 +80,8 @@ public class Underworld {
         config.read();
         BiomeGenUnderworld.biome = (new BiomeGenUnderworld(26)).setColor(16711680).setBiomeName("Underworld").setDisableRain().setTemperatureRainfall(1.0F, 0.0F);
         mantleOrCore = registerBlock(new BlockMantleOrCore().setBlockName("mantleOrCore"), ItemBlockMantleOrCore.class);
+        runestoneMithril = (BlockRunestone) registerBlock(new BlockRunestone("mithril").setHardness(2.4F).setResistance(20.0F).setStepSound(Block.soundTypeStone).setBlockName("runestone_mithril").setBlockTextureName("obsidian"));
+        runestoneAdamantium = (BlockRunestone) registerBlock(new BlockRunestone("adamantium").setHardness(2.4F).setResistance(20.0F).setStepSound(Block.soundTypeStone).setBlockName("runestone_adamantium").setBlockTextureName("obsidian"));
     }
 
     @Mod.EventHandler

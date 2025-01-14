@@ -87,7 +87,7 @@ public class UnderworldDecorator extends BiomeDecorator {
                 Block replace = GameRegistry.findBlock(b[0], b[1]);
                 if (replace == null)
                     replace = Blocks.stone;
-                ores.add(new WorldGenMinableUnderworld(block, meta, replace, a.veinSize, a.minY, a.maxY, a.oreDict.equals("gravel") ? a.frequency : (int) (a.frequency * ConfigUnderWorld.ore_mutiplier), a.uniformDistribution, a.sizeIncreasesWithDepth));
+                ores.add(new WorldGenMinableUnderworld(block, meta, replace, a.veinSize, a.minY, a.maxY, a.oreDict.equals("gravel") ? a.frequency : (int) (a.frequency * ConfigUnderWorld.ore_multiplier), a.uniformDistribution, a.sizeIncreasesWithDepth));
             });
             oreGens = ores.toArray(new WorldGenMinableUnderworld[0]);
             Underworld.oreEntries = null;

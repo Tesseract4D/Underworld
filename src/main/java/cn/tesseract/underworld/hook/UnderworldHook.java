@@ -6,18 +6,21 @@ import cn.tesseract.underworld.Underworld;
 import cn.tesseract.underworld.util.ChunkPostField;
 import cn.tesseract.underworld.util.RNG;
 import cn.tesseract.underworld.world.ChunkProviderUnderworld;
-import cn.tesseract.underworld.world.WorldUnderworld;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.profiler.Profiler;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldProvider;
+import net.minecraft.world.WorldSettings;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+import net.minecraft.world.storage.ISaveHandler;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Random;
@@ -29,12 +32,10 @@ public class UnderworldHook {
         return player.worldObj.provider.dimensionId == -2 ? 0 : c.getNightVisionBrightness(player, d);
     }
 
-    @Hook(createMethod = true)
-    public static void travelToDimensionUnderworld(Entity c, int dimensionId) {
-        if (c.worldObj.provider.dimensionId == 0)
-            c.travelToDimension(-2);
-        else
-            c.travelToDimension(dimensionId);
+    @Hook(injectOnExit = true, targetMethod = "<init>")
+    public static void init(World c, ISaveHandler p_i45369_1_, String p_i45369_2_, WorldSettings p_i45369_3_, WorldProvider p_i45369_4_, Profiler p_i45369_5_) {
+        ((IWorldData) c).set_mycelium_posts(new ChunkPostField(1, c.getSeed(), 24, 0.0625F));
+        ((IWorldData) c).set_rng(new RNG());
     }
 
     @Hook(returnCondition = ReturnCondition.ON_TRUE, returnNull = true)
@@ -80,7 +81,7 @@ public class UnderworldHook {
         int base_x = c.xPosition << 4;
         int base_z = c.zPosition << 4;
         if (world.provider.dimensionId == -2) {
-            RNG rng = WorldUnderworld.get(world).rng;
+            RNG rng = ((IWorldData) world).get_rng();
             Random random = new Random(world.getSeed() * (long) ChunkPostField.getIntPairHash(c.xPosition, c.zPosition));
             int y_offset = Underworld.underworld_y_offset;
             double scale_xz = 0.015625;
