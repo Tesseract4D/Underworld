@@ -1,6 +1,6 @@
 package cn.tesseract.underworld.world;
 
-import cn.tesseract.underworld.Main;
+import cn.tesseract.underworld.Underworld;
 import cn.tesseract.underworld.util.RNG;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
@@ -354,7 +354,7 @@ public final class ChunkProviderUnderworld implements IChunkProvider {
         //if (this.worldObj.underworld_y_offset != 0) {
         for (int i = 0; i < 16; ++i) {
             int x = var4 + this.hellRNG.nextInt(16) + 8;
-            int y = this.hellRNG.nextInt(32) + 20 + Main.underworld_y_offset;
+            int y = this.hellRNG.nextInt(32) + 20 + Underworld.underworld_y_offset;
             int z = var5 + this.hellRNG.nextInt(16) + 8;
             (new WorldGenDungeons()).generate(this.worldObj, this.hellRNG, x, y, z);
         }

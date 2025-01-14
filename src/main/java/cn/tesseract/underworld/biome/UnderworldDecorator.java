@@ -1,6 +1,6 @@
-package cn.tesseract.underworld.biomes;
+package cn.tesseract.underworld.biome;
 
-import cn.tesseract.underworld.Main;
+import cn.tesseract.underworld.Underworld;
 import cn.tesseract.underworld.config.ConfigUnderWorld;
 import cn.tesseract.underworld.world.WorldGenMinableUnderworld;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -47,14 +47,14 @@ public class UnderworldDecorator extends BiomeDecorator {
             int k = this.chunk_X + this.randomGenerator.nextInt(16) + 8;
             int l = this.randomGenerator.nextInt(this.randomGenerator.nextInt(248) + 8);
             int i1 = this.chunk_Z + this.randomGenerator.nextInt(16) + 8;
-            (new WorldGenLiquids(Blocks.flowing_water)).generate(this.currentWorld, this.randomGenerator, k, l + Main.underworld_y_offset, i1);
+            (new WorldGenLiquids(Blocks.flowing_water)).generate(this.currentWorld, this.randomGenerator, k, l + Underworld.underworld_y_offset, i1);
         }
 
         for (int j = 0; j < 10; ++j) {
             int k = this.chunk_X + this.randomGenerator.nextInt(16) + 8;
             int l = this.randomGenerator.nextInt(this.randomGenerator.nextInt(this.randomGenerator.nextInt(240) + 8) + 8);
             int i1 = this.chunk_Z + this.randomGenerator.nextInt(16) + 8;
-            (new WorldGenLiquids(Blocks.flowing_lava)).generate(this.currentWorld, this.randomGenerator, k, l + Main.underworld_y_offset, i1);
+            (new WorldGenLiquids(Blocks.flowing_lava)).generate(this.currentWorld, this.randomGenerator, k, l + Underworld.underworld_y_offset, i1);
         }
         this.generateOres();
     }
@@ -63,7 +63,7 @@ public class UnderworldDecorator extends BiomeDecorator {
         if (!initialized) {
             initialized = true;
             ArrayList<WorldGenMinableUnderworld> ores = new ArrayList<>();
-            Main.oreEntries.forEach(a -> {
+            Underworld.oreEntries.forEach(a -> {
                 if (a.disable)
                     return;
                 String[] b = a.block.split(":");
@@ -90,7 +90,7 @@ public class UnderworldDecorator extends BiomeDecorator {
                 ores.add(new WorldGenMinableUnderworld(block, meta, replace, a.veinSize, a.minY, a.maxY, a.oreDict.equals("gravel") ? a.frequency : (int) (a.frequency * ConfigUnderWorld.ore_mutiplier), a.uniformDistribution, a.sizeIncreasesWithDepth));
             });
             oreGens = ores.toArray(new WorldGenMinableUnderworld[0]);
-            Main.oreEntries = null;
+            Underworld.oreEntries = null;
         }
 
         for (WorldGenMinableUnderworld g : oreGens) {

@@ -1,12 +1,11 @@
 package cn.tesseract.underworld.config;
 
 import cn.tesseract.mycelium.config.Comment;
-import cn.tesseract.mycelium.config.Config;
-import cn.tesseract.mycelium.config.IConfigProperties;
+import cn.tesseract.mycelium.config.ConfigProperties;
 
 import java.io.File;
 
-public class ConfigOreEntry extends Config implements IConfigProperties {
+public class ConfigOreEntry extends ConfigProperties {
     @Comment("矿物词典，当找不到对应的方块时将选取该矿物词典中第一个方块来生成")
     public String oreDict;
     @Comment("是否禁用")
@@ -38,7 +37,7 @@ public class ConfigOreEntry extends Config implements IConfigProperties {
     public boolean sizeIncreasesWithDepth;
 
     public ConfigOreEntry(String file, String[] data) {
-        super(file, "");
+        super(file);
         this.oreDict = data[0];
         this.disable = Boolean.parseBoolean(data[1]);
         this.block = data[2];
@@ -52,19 +51,7 @@ public class ConfigOreEntry extends Config implements IConfigProperties {
         this.sizeIncreasesWithDepth = Boolean.parseBoolean(data[10]);
     }
 
-    public ConfigOreEntry(File file, String defaultConfig) {
-        super(file, defaultConfig);
-    }
-
-    @Override
-    public Config read() {
-        loadProperties(readFile());
-        return save(toProperties());
-    }
-
-    @Override
-    public Config save(String s) {
-        saveFile(s);
-        return this;
+    public ConfigOreEntry(File file) {
+        super(file);
     }
 }

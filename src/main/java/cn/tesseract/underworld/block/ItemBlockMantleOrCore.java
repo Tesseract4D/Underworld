@@ -1,4 +1,4 @@
-package cn.tesseract.underworld.blocks;
+package cn.tesseract.underworld.block;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;

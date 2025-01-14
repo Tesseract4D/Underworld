@@ -1,7 +1,7 @@
 package cn.tesseract.underworld.world;
 
 
-import cn.tesseract.underworld.biomes.BiomeGenUnderworld;
+import cn.tesseract.underworld.biome.BiomeGenUnderworld;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.util.Vec3;

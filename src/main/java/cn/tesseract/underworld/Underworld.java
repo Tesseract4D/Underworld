@@ -1,11 +1,8 @@
 package cn.tesseract.underworld;
 
-import cn.tesseract.mycelium.asm.NodeTransformer;
-import cn.tesseract.mycelium.asm.minecraft.HookLibPlugin;
-import cn.tesseract.mycelium.asm.minecraft.HookLoader;
-import cn.tesseract.underworld.biomes.BiomeGenUnderworld;
-import cn.tesseract.underworld.blocks.BlockMantleOrCore;
-import cn.tesseract.underworld.blocks.ItemBlockMantleOrCore;
+import cn.tesseract.underworld.biome.BiomeGenUnderworld;
+import cn.tesseract.underworld.block.BlockMantleOrCore;
+import cn.tesseract.underworld.block.ItemBlockMantleOrCore;
 import cn.tesseract.underworld.config.ConfigOreEntry;
 import cn.tesseract.underworld.config.ConfigUnderWorld;
 import cn.tesseract.underworld.world.WorldProviderUnderworld;
@@ -23,16 +20,12 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.entity.living.LivingEvent;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
 
 import java.io.File;
 import java.util.ArrayList;
 
 @Mod(modid = "underworld", acceptedMinecraftVersions = "[1.7.10]")
-public class Main extends HookLoader {
+public class Underworld {
     public static int underworld_y_offset = 120;
     public static Block mantleOrCore;
     public static ArrayList<ConfigOreEntry> oreEntries = new ArrayList<>();
@@ -47,7 +40,7 @@ public class Main extends HookLoader {
             if (files != null)
                 for (File file : files) {
                     if (file.isFile() && file.getName().endsWith(".properties")) {
-                        ConfigOreEntry entry = new ConfigOreEntry(file, "");
+                        ConfigOreEntry entry = new ConfigOreEntry(file);
                         entry.read();
                         oreEntries.add(entry);
                     }
@@ -76,7 +69,7 @@ public class Main extends HookLoader {
                 oreMithril,false,*:*,0,3,0,255,minecraft:stone,8,false,true""";
             for (String line : ores.split("\n")) {
                 String[] data = line.split(",");
-                ConfigOreEntry entry = new ConfigOreEntry("underworld/" + data[0] + ".properties", data);
+                ConfigOreEntry entry = new ConfigOreEntry("underworld/" + data[0], data);
                 entry.save(entry.toProperties());
                 oreEntries.add(entry);
             }
@@ -115,40 +108,5 @@ public class Main extends HookLoader {
 
     public static Block registerBlock(Block block) {
         return GameRegistry.registerBlock(block, block.getUnlocalizedName().replace("tile.", ""));
-    }
-
-    @Override
-    protected void registerHooks() {
-        registerHookContainer("cn.tesseract.underworld.hook.UnderworldHook");
-        registerNodeTransformer("net.minecraft.client.renderer.EntityRenderer", new NodeTransformer() {
-            @Override
-            public void transform(ClassNode node) {
-                for (MethodNode method : node.methods) {
-                    if (HookLibPlugin.getMethodMcpName(method.name).equals("updateFogColor"))
-                        for (int i = 0; i < method.instructions.size(); i++) {
-                            AbstractInsnNode insn = method.instructions.get(i);
-                            if (insn instanceof MethodInsnNode minsn)
-                                if (HookLibPlugin.getMethodMcpName(minsn.name).equals("getNightVisionBrightness")) {
-                                    minsn.name = "getFogNightVisionBrightness";
-                                }
-                        }
-                }
-            }
-        });
-        registerNodeTransformer("net.minecraft.entity.Entity", new NodeTransformer() {
-            @Override
-            public void transform(ClassNode node) {
-                for (MethodNode method : node.methods) {
-                    if (HookLibPlugin.getMethodMcpName(method.name).equals("onEntityUpdate"))
-                        for (int i = 0; i < method.instructions.size(); i++) {
-                            AbstractInsnNode insn = method.instructions.get(i);
-                            if (insn instanceof MethodInsnNode minsn)
-                                if (HookLibPlugin.getMethodMcpName(minsn.name).equals("travelToDimension")) {
-                                    minsn.name = "travelToDimensionUnderworld";
-                                }
-                        }
-                }
-            }
-        });
     }
 }

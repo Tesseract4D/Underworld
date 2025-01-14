@@ -2,7 +2,7 @@ package cn.tesseract.underworld.hook;
 
 import cn.tesseract.mycelium.asm.Hook;
 import cn.tesseract.mycelium.asm.ReturnCondition;
-import cn.tesseract.underworld.Main;
+import cn.tesseract.underworld.Underworld;
 import cn.tesseract.underworld.util.ChunkPostField;
 import cn.tesseract.underworld.util.RNG;
 import cn.tesseract.underworld.world.ChunkProviderUnderworld;
@@ -51,7 +51,7 @@ public class UnderworldHook {
 
     @Hook(injectOnExit = true, returnCondition = ReturnCondition.ALWAYS)
     public static boolean handleLavaMovement(Entity c, @Hook.ReturnValue boolean b) {
-        return b || doesBoundingBoxContainBlock(c.worldObj, c.boundingBox.expand(0.001, 0.001, 0.001), Main.mantleOrCore);
+        return b || doesBoundingBoxContainBlock(c.worldObj, c.boundingBox.expand(0.001, 0.001, 0.001), Underworld.mantleOrCore);
     }
 
     public static boolean doesBoundingBoxContainBlock(World world, AxisAlignedBB box, Block b) {
@@ -82,7 +82,7 @@ public class UnderworldHook {
         if (world.provider.dimensionId == -2) {
             RNG rng = WorldUnderworld.get(world).rng;
             Random random = new Random(world.getSeed() * (long) ChunkPostField.getIntPairHash(c.xPosition, c.zPosition));
-            int y_offset = Main.underworld_y_offset;
+            int y_offset = Underworld.underworld_y_offset;
             double scale_xz = 0.015625;
             double scale_y = 0.03125;
             ChunkProviderUnderworld.bedrock_strata_1a_noise = ChunkProviderUnderworld.noise_gen_bedrock_strata_1a.generateNoiseOctaves(ChunkProviderUnderworld.bedrock_strata_1a_noise, base_x, 0, base_z, 16, 1, 16, scale_xz * 2.0, scale_y * 2.0, scale_xz * 2.0);
@@ -107,7 +107,7 @@ public class UnderworldHook {
                         if (var8 < 0 || var8 > 127) {
                             index = -1;
                             if ((var8 += y_offset) < num_bedrock_blocks) {
-                                var9 = Main.mantleOrCore;
+                                var9 = Underworld.mantleOrCore;
                             } else if (var8 > 255 - num_bedrock_blocks) {
                                 var9 = Blocks.bedrock;
                             } else {
