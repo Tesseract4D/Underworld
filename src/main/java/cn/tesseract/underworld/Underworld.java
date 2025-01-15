@@ -19,6 +19,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.entity.living.LivingEvent;
 

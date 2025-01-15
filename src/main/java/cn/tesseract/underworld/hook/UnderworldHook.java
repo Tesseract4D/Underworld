@@ -7,6 +7,8 @@ import cn.tesseract.underworld.util.ChunkPostField;
 import cn.tesseract.underworld.util.RNG;
 import cn.tesseract.underworld.world.ChunkProviderUnderworld;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockPortal;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.entity.Entity;
@@ -14,6 +16,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
@@ -30,6 +33,11 @@ public class UnderworldHook {
     @Hook(createMethod = true)
     public static float getFogNightVisionBrightness(EntityRenderer c, EntityPlayer player, float d) {
         return player.worldObj.provider.dimensionId == -2 ? 0 : c.getNightVisionBrightness(player, d);
+    }
+
+    @Hook(createMethod = true, returnCondition = ReturnCondition.ALWAYS)
+    public static IIcon getOverlayIcon(BlockPortal c, int i) {
+        return c.getIcon(1, ((IPortalData) Minecraft.getMinecraft().thePlayer).get_portalType() << 2);
     }
 
     @Hook(injectOnExit = true, targetMethod = "<init>")

@@ -15,8 +15,8 @@ import static org.objectweb.asm.Type.*;
 public class Accessor implements NodeTransformer {
     private final String accessor;
 
-    Map<String, String> getterMap = new HashMap<>();
-    Map<String, String> setterMap = new HashMap<>();
+    private final Map<String, String> getterMap = new HashMap<>();
+    private final Map<String, String> setterMap = new HashMap<>();
 
     public Accessor(String accessor) {
         this.accessor = accessor;
@@ -31,7 +31,7 @@ public class Accessor implements NodeTransformer {
             throw new RuntimeException(e);
         }
         ClassReader cr = new ClassReader(bytecode);
-        ClassVisitor interfaceVisitor = new ClassVisitor(Opcodes.ASM5) {
+        ClassVisitor cv = new ClassVisitor(Opcodes.ASM5) {
             @Override
             public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
                 if (name.startsWith("get_")) {
@@ -43,7 +43,7 @@ public class Accessor implements NodeTransformer {
             }
         };
 
-        cr.accept(interfaceVisitor, ClassReader.EXPAND_FRAMES);
+        cr.accept(cv, ClassReader.EXPAND_FRAMES);
 
         node.interfaces.add(accessor.replace('.', '/'));
         getterMap.forEach((name, desc) -> {
@@ -93,33 +93,33 @@ public class Accessor implements NodeTransformer {
         });
     }
 
-    public static int getLoad(Type parameterType) {
-        if (parameterType == INT_TYPE || parameterType == BYTE_TYPE || parameterType == CHAR_TYPE ||
-            parameterType == BOOLEAN_TYPE || parameterType == SHORT_TYPE) {
+    public static int getLoad(Type type) {
+        if (type == INT_TYPE || type == BYTE_TYPE || type == CHAR_TYPE ||
+            type == BOOLEAN_TYPE || type == SHORT_TYPE) {
             return ILOAD;
-        } else if (parameterType == LONG_TYPE) {
+        } else if (type == LONG_TYPE) {
             return LLOAD;
-        } else if (parameterType == FLOAT_TYPE) {
+        } else if (type == FLOAT_TYPE) {
             return FLOAD;
-        } else if (parameterType == DOUBLE_TYPE) {
+        } else if (type == DOUBLE_TYPE) {
             return DLOAD;
         } else {
             return ALOAD;
         }
     }
 
-    public static int getReturn(Type targetMethodReturnType) {
-        if (targetMethodReturnType == INT_TYPE || targetMethodReturnType == SHORT_TYPE ||
-            targetMethodReturnType == BOOLEAN_TYPE || targetMethodReturnType == BYTE_TYPE
-            || targetMethodReturnType == CHAR_TYPE) {
+    public static int getReturn(Type type) {
+        if (type == INT_TYPE || type == SHORT_TYPE ||
+            type == BOOLEAN_TYPE || type == BYTE_TYPE
+            || type == CHAR_TYPE) {
             return IRETURN;
-        } else if (targetMethodReturnType == LONG_TYPE) {
+        } else if (type == LONG_TYPE) {
             return LRETURN;
-        } else if (targetMethodReturnType == FLOAT_TYPE) {
+        } else if (type == FLOAT_TYPE) {
             return FRETURN;
-        } else if (targetMethodReturnType == DOUBLE_TYPE) {
+        } else if (type == DOUBLE_TYPE) {
             return DRETURN;
-        } else if (targetMethodReturnType == VOID_TYPE) {
+        } else if (type == VOID_TYPE) {
             return RETURN;
         } else {
             return ARETURN;

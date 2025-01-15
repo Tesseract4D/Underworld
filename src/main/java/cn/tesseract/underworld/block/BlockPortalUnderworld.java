@@ -1,5 +1,6 @@
 package cn.tesseract.underworld.block;
 
+import cn.tesseract.underworld.hook.IPortalData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.material.Material;
@@ -12,8 +13,8 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
 public class BlockPortalUnderworld extends BlockPortal {
-    private IIcon runegate_icon;
-    private IIcon nether_portal_icon;
+    public IIcon runegate_icon;
+    public IIcon nether_portal_icon;
 
     public BlockPortalUnderworld() {
         super();
@@ -47,19 +48,18 @@ public class BlockPortalUnderworld extends BlockPortal {
     public void onEntityCollidedWithBlock(World worldIn, int x, int y, int z, Entity entityIn) {
         if (entityIn.ridingEntity == null && entityIn.riddenByEntity == null) {
             entityIn.setInPortal();
-
+            ((IPortalData) entityIn).set_portalType(worldIn.getBlockMetadata(x, y, z));
         }
     }
 
     public void onNeighborBlockChange(World worldIn, int x, int y, int z, Block neighbor) {
-        Size size = new Size(worldIn, x, y, z, 1);
-        Size size1 = new Size(worldIn, x, y, z, 2);
-        if (!((size.isValid() && size.portalBlockCount == size.width * size.height) || (size1.isValid() && size1.portalBlockCount == size1.width * size1.height)))
+        Size size = new Size(worldIn, x, y, z, worldIn.getBlockMetadata(x, y, z) % 4);
+        if (!((size.isValid() && size.portalBlockCount == size.width * size.height)))
             worldIn.setBlock(x, y, z, Blocks.air);
     }
 
     public IIcon getIcon(int side, int meta) {
-        return switch (meta) {
+        return switch (meta >> 2) {
             case 1 -> blockIcon;
             case 2 -> nether_portal_icon;
             default -> runegate_icon;
@@ -202,7 +202,7 @@ public class BlockPortalUnderworld extends BlockPortal {
 
         public void placePortalBlocks() {
             int dirX = Direction.offsetX[leftDir], dirZ = Direction.offsetZ[leftDir];
-            boolean f;
+            boolean f = false;
 
             System.out.println(world.getBlock(bottomLeft.posX - dirX, bottomLeft.posY - 1, bottomLeft.posZ - dirZ));
             System.out.println(world.getBlock(bottomLeft.posX - dirX * width - 1, bottomLeft.posY - 1, bottomLeft.posZ - dirZ * width - 1));
@@ -219,13 +219,23 @@ public class BlockPortalUnderworld extends BlockPortal {
                     }
                 }
 
+            int meta = 0, dim = world.provider.dimensionId;
+            if (f) {
+                if (dim == 0)
+                    meta = 1;
+                else if (dim == -2)
+                    meta = 2;
+            } else if (dim == -1) {
+                meta = 1;
+            }
+
             for (int i = 0; i < width; ++i) {
                 int j = bottomLeft.posX + Direction.offsetX[leftDir] * i;
                 int k = bottomLeft.posZ + Direction.offsetZ[leftDir] * i;
 
                 for (int l = 0; l < height; ++l) {
                     int i1 = bottomLeft.posY + l;
-                    world.setBlock(j, i1, k, Blocks.portal, 0, 2);
+                    world.setBlock(j, i1, k, Blocks.portal, (meta << 2) + axis, 2);
                 }
             }
         }
