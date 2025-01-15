@@ -13,14 +13,15 @@ import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.profiler.Profiler;
+import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldProvider;
-import net.minecraft.world.WorldSettings;
+import net.minecraft.world.*;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraft.world.storage.ISaveHandler;
@@ -40,10 +41,34 @@ public class UnderworldHook {
         return c.getIcon(1, ((IPortalData) Minecraft.getMinecraft().thePlayer).get_portalType() << 2);
     }
 
-    @Hook(injectOnExit = true, targetMethod = "<init>")
-    public static void init(World c, ISaveHandler p_i45369_1_, String p_i45369_2_, WorldSettings p_i45369_3_, WorldProvider p_i45369_4_, Profiler p_i45369_5_) {
-        ((IWorldData) c).set_mycelium_posts(new ChunkPostField(1, c.getSeed(), 24, 0.0625F));
-        ((IWorldData) c).set_rng(new RNG());
+    @Hook(createMethod = true)
+    public static void travelToDimensionUnderworld(Entity c, int dimensionId) {
+        if (c.inPortal) {
+            int type = ((IPortalData) c).get_portalType(), dim = c.dimension;
+            if (type == 0) {
+                if (dim == 0) {
+                    ChunkCoordinates pos = c.worldObj.getSpawnPoint();
+                    doTeleport(c, pos.posX + 0.5, c.worldObj.getTopSolidOrLiquidBlock(pos.posX, pos.posZ) + 2, pos.posZ + 0.5);
+                }
+                if (dim == -2)
+                    c.travelToDimension(0);
+            } else if (type == 1) {
+                c.posY = 240;
+                if (dim == 0)
+                    c.travelToDimension(-2);
+                else if (dim == -1)
+                    c.travelToDimension(-2);
+            } else if (type == 2 && dim == -2)
+                c.travelToDimension(-1);
+        } else
+            c.travelToDimension(dimensionId);
+    }
+
+    public static void doTeleport(Entity e, double x, double y, double z) {
+        if (e instanceof EntityPlayerMP p)
+            ((EntityPlayerMP) e).setPositionAndUpdate(x, y, z);
+        else
+            e.setPosition(x, y, z);
     }
 
     @Hook(returnCondition = ReturnCondition.ON_TRUE, returnNull = true)
@@ -83,12 +108,23 @@ public class UnderworldHook {
         return false;
     }
 
-    @Hook(targetMethod = "<init>", injectOnLine = 1, returnCondition = ReturnCondition.ON_TRUE, returnNull = true)
-    public static boolean Chunk(Chunk c, World world, Block[] blocks, int cx, int xz) {
-        int maxY = blocks.length / 256;
-        int base_x = c.xPosition << 4;
-        int base_z = c.zPosition << 4;
+    @Hook(injectOnExit = true, targetMethod = "<init>")
+    public static void init(World c, ISaveHandler p_i45369_1_, String p_i45369_2_, WorldSettings p_i45369_3_, WorldProvider p_i45369_4_, Profiler p_i45369_5_) {
+        ((IWorldData) c).set_mycelium_posts(new ChunkPostField(1, c.getSeed(), 24, 0.0625F));
+        ((IWorldData) c).set_rng(new RNG());
+    }
+
+    @Hook(injectOnExit = true, targetMethod = "<init>")
+    public static void init(Entity c, World worldIn) {
+        ((IPortalData) c).set_lastPortalPos(new ChunkCoordinates());
+    }
+
+    @Hook(targetMethod = "<init>", injectOnLine = 1, returnCondition = ReturnCondition.ON_TRUE)
+    public static boolean init(Chunk c, World world, Block[] blocks, int cx, int xz) {
         if (world.provider.dimensionId == -2) {
+            int maxY = blocks.length / 256;
+            int base_x = c.xPosition << 4;
+            int base_z = c.zPosition << 4;
             RNG rng = ((IWorldData) world).get_rng();
             Random random = new Random(world.getSeed() * (long) ChunkPostField.getIntPairHash(c.xPosition, c.zPosition));
             int y_offset = Underworld.underworld_y_offset;

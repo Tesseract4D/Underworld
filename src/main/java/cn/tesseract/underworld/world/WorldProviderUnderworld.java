@@ -50,6 +50,11 @@ public class WorldProviderUnderworld extends WorldProvider {
         return false;
     }
 
+    @Override
+    public int getActualHeight() {
+        return 256;
+    }
+
     @SideOnly(Side.CLIENT)
     public float getCloudHeight() {
         return 8.0F;

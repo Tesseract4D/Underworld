@@ -28,7 +28,7 @@ import java.util.ArrayList;
 
 @Mod(modid = "underworld", acceptedMinecraftVersions = "[1.7.10]")
 public class Underworld {
-    public static int underworld_y_offset = 120;
+    public static final int underworld_y_offset = 120;
     public static Block mantleOrCore;
     public static BlockRunestone runestoneMithril;
     public static BlockRunestone runestoneAdamantium;

@@ -1,5 +1,6 @@
 package cn.tesseract.underworld.block;
 
+import cn.tesseract.underworld.Underworld;
 import cn.tesseract.underworld.hook.IPortalData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
@@ -26,7 +27,6 @@ public class BlockPortalUnderworld extends BlockPortal {
         nether_portal_icon = reg.registerIcon("underworld:portal_nether");
     }
 
-    @Override
     public boolean func_150000_e(World world, int x, int y, int z) {
         Size size = new Size(world, x, y, z, 1);
 
@@ -48,14 +48,22 @@ public class BlockPortalUnderworld extends BlockPortal {
     public void onEntityCollidedWithBlock(World worldIn, int x, int y, int z, Entity entityIn) {
         if (entityIn.ridingEntity == null && entityIn.riddenByEntity == null) {
             entityIn.setInPortal();
-            ((IPortalData) entityIn).set_portalType(worldIn.getBlockMetadata(x, y, z));
+            IPortalData data = ((IPortalData) entityIn);
+            data.set_portalType(worldIn.getBlockMetadata(x, y, z) >> 2);
+            ChunkCoordinates pos = data.get_lastPortalPos();
+            pos.posX = x;
+            pos.posY = y;
+            pos.posZ = z;
         }
     }
 
     public void onNeighborBlockChange(World worldIn, int x, int y, int z, Block neighbor) {
-        Size size = new Size(worldIn, x, y, z, worldIn.getBlockMetadata(x, y, z) % 4);
-        if (!((size.isValid() && size.portalBlockCount == size.width * size.height)))
-            worldIn.setBlock(x, y, z, Blocks.air);
+        int axis = worldIn.getBlockMetadata(x, y, z) & 3;
+        if (axis == 1 || axis == 2) {
+            Size size = new Size(worldIn, x, y, z, axis);
+            if (!((size.isValid() && size.portalBlockCount == size.width * size.height)))
+                worldIn.setBlock(x, y, z, Blocks.air);
+        }
     }
 
     public IIcon getIcon(int side, int meta) {
@@ -197,7 +205,9 @@ public class BlockPortalUnderworld extends BlockPortal {
         }
 
         public final boolean isBottomBlock(World world, int x, int y, int z) {
-            return world.getBlock(x, y, z) == Blocks.bedrock;
+            int dim = world.provider.dimensionId;
+            Block block = world.getBlock(x, y, z);
+            return dim == 0 ? block == Blocks.bedrock : block == Underworld.mantleOrCore;
         }
 
         public void placePortalBlocks() {
@@ -210,7 +220,7 @@ public class BlockPortalUnderworld extends BlockPortal {
             System.out.println(world.getBlock(bottomLeft.posX - dirX * width - 1, bottomLeft.posY + height, bottomLeft.posZ - dirZ * width - 1));
 
             if (bottomLeft.posY < 8)
-                for (int i = -1; i < width + 1; ++i) {
+                for (int i = 0; i < width; ++i) {
                     int j = bottomLeft.posX + dirX * i;
                     int k = bottomLeft.posZ + dirZ * i;
                     if (isBottomBlock(world, j, bottomLeft.posY - 2, k)) {

@@ -26,13 +26,10 @@ public final class ChunkProviderUnderworld implements IChunkProvider {
     private final NoiseGeneratorOctaves netherNoiseGen1;
     private final NoiseGeneratorOctaves netherNoiseGen2;
     private final NoiseGeneratorOctaves netherNoiseGen3;
-    private final NoiseGeneratorOctaves slowsandGravelNoiseGen;
-    private final NoiseGeneratorOctaves netherrackExculsivityNoiseGen;
     public NoiseGeneratorOctaves netherNoiseGen6;
     public NoiseGeneratorOctaves netherNoiseGen7;
     private final World worldObj;
     private double[] noiseField;
-    private final MapGenBase netherCaveGenerator = new MapGenCavesHell();
     double[] noiseData1;
     double[] noiseData2;
     double[] noiseData3;
@@ -67,8 +64,6 @@ public final class ChunkProviderUnderworld implements IChunkProvider {
         this.netherNoiseGen1 = new NoiseGeneratorOctaves(this.hellRNG, 16);
         this.netherNoiseGen2 = new NoiseGeneratorOctaves(this.hellRNG, 16);
         this.netherNoiseGen3 = new NoiseGeneratorOctaves(this.hellRNG, 8);
-        this.slowsandGravelNoiseGen = new NoiseGeneratorOctaves(this.hellRNG, 4);
-        this.netherrackExculsivityNoiseGen = new NoiseGeneratorOctaves(this.hellRNG, 4);
         this.netherNoiseGen6 = new NoiseGeneratorOctaves(this.hellRNG, 10);
         this.netherNoiseGen7 = new NoiseGeneratorOctaves(this.hellRNG, 16);
         noise_gen_bedrock_strata_1a = new NoiseGeneratorOctaves(this.hellRNG, 4);
