@@ -231,9 +231,9 @@ public final class ChunkProviderUnderworld implements IChunkProvider {
         }
     }
 
-    private double[] initializeNoiseField(double[] par1ArrayOfDouble, int par2, int par3, int par4, int par5, int par6, int par7) {
-        if (par1ArrayOfDouble == null) {
-            par1ArrayOfDouble = new double[par5 * par6 * par7];
+    private double[] initializeNoiseField(double[] noise, int par2, int par3, int par4, int par5, int par6, int par7) {
+        if (noise == null) {
+            noise = new double[par5 * par6 * par7];
         }
 
         double var8 = 684.412;
@@ -244,7 +244,6 @@ public final class ChunkProviderUnderworld implements IChunkProvider {
         this.noiseData2 = this.netherNoiseGen1.generateNoiseOctaves(this.noiseData2, par2, par3, par4, par5, par6, par7, var8, var10, var8);
         this.noiseData3 = this.netherNoiseGen2.generateNoiseOctaves(this.noiseData3, par2, par3, par4, par5, par6, par7, var8, var10, var8);
         int var12 = 0;
-        int var13 = 0;
         double[] var14 = new double[par6];
 
         int var15;
@@ -263,41 +262,9 @@ public final class ChunkProviderUnderworld implements IChunkProvider {
 
         for (var15 = 0; var15 < par5; ++var15) {
             for (int var36 = 0; var36 < par7; ++var36) {
-                double var17 = (this.noiseData4[var13] + 256.0) / 512.0;
-                if (var17 > 1.0) {
-                    var17 = 1.0;
-                }
-
-                double var19 = 0.0;
-                double var21 = this.noiseData5[var13] / 8000.0;
-                if (var21 < 0.0) {
-                    var21 = -var21;
-                }
-
-                var21 = var21 * 3.0 - 3.0;
-                if (var21 < 0.0) {
-                    var21 /= 2.0;
-                    if (var21 < -1.0) {
-                        var21 = -1.0;
-                    }
-
-                    var21 /= 1.4;
-                    var21 /= 2.0;
-                    var17 = 0.0;
-                } else {
-                    if (var21 > 1.0) {
-                        var21 = 1.0;
-                    }
-
-                    var21 /= 6.0;
-                }
-
-                var17 += 0.5;
-                var21 = var21 * (double) par6 / 16.0;
-                ++var13;
 
                 for (int var23 = 0; var23 < par6; ++var23) {
-                    double var24 = 0.0;
+                    double var24;
                     double var26 = var14[var23];
                     double var28 = this.noiseData2[var12] / 512.0;
                     double var30 = this.noiseData3[var12] / 512.0;
@@ -317,26 +284,13 @@ public final class ChunkProviderUnderworld implements IChunkProvider {
                         var24 = var24 * (1.0 - var34) + -10.0 * var34;
                     }
 
-                    if ((double) var23 < var19) {
-                        var34 = (var19 - (double) var23) / 4.0;
-                        if (var34 < 0.0) {
-                            var34 = 0.0;
-                        }
-
-                        if (var34 > 1.0) {
-                            var34 = 1.0;
-                        }
-
-                        var24 = var24 * (1.0 - var34) + -10.0 * var34;
-                    }
-
-                    par1ArrayOfDouble[var12] = var24;
+                    noise[var12] = var24;
                     ++var12;
                 }
             }
         }
 
-        return par1ArrayOfDouble;
+        return noise;
     }
 
     public boolean chunkExists(int par1, int par2) {
@@ -347,14 +301,12 @@ public final class ChunkProviderUnderworld implements IChunkProvider {
         BlockFalling.fallInstantly = true;
         int var4 = par2 * 16;
         int var5 = par3 * 16;
-        //if (this.worldObj.underworld_y_offset != 0) {
-        for (int i = 0; i < 16; ++i) {
+        for (int i = 0; i < 24; ++i) {
             int x = var4 + this.hellRNG.nextInt(16) + 8;
             int y = this.hellRNG.nextInt(32) + 20 + Underworld.underworld_y_offset;
             int z = var5 + this.hellRNG.nextInt(16) + 8;
             (new WorldGenDungeons()).generate(this.worldObj, this.hellRNG, x, y, z);
         }
-        //}
 
         BiomeGenBase biome = this.worldObj.getBiomeGenForCoords(var4 + 16, var5 + 16);
         biome.decorate(this.worldObj, this.worldObj.rand, var4, var5);

@@ -16,12 +16,14 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.profiler.Profiler;
-import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
-import net.minecraft.world.*;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldProvider;
+import net.minecraft.world.WorldServer;
+import net.minecraft.world.WorldSettings;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraft.world.storage.ISaveHandler;
@@ -34,6 +36,14 @@ public class UnderworldHook {
     @Hook(createMethod = true)
     public static float getFogNightVisionBrightness(EntityRenderer c, EntityPlayer player, float d) {
         return player.worldObj.provider.dimensionId == -2 ? 0 : c.getNightVisionBrightness(player, d);
+    }
+
+    @Hook(createMethod = true)
+    public static boolean setPortalBlock(WorldServer c, int x, int y, int z, Block blockIn, int metadataIn, int flags) {
+        if (blockIn == Blocks.portal) {
+            return c.setBlock(x, y, z, blockIn, c.provider.dimensionId == -2 ? 2 : 6, flags);
+        } else
+            return c.setBlock(x, y, z, blockIn, metadataIn, flags);
     }
 
     @Hook(createMethod = true, returnCondition = ReturnCondition.ALWAYS)
@@ -53,7 +63,6 @@ public class UnderworldHook {
                 if (dim == -2)
                     c.travelToDimension(0);
             } else if (type == 1) {
-                c.posY = 240;
                 if (dim == 0)
                     c.travelToDimension(-2);
                 else if (dim == -1)

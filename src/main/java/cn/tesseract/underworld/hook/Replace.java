@@ -22,11 +22,11 @@ public class Replace implements NodeTransformer {
         for (MethodNode method : node.methods) {
             if (HookLibPlugin.getMethodMcpName(method.name).equals(this.method))
                 for (int i = 0; i < method.instructions.size(); i++) {
-                    if (method.instructions.get(i) instanceof MethodInsnNode insn)
+                    if (method.instructions.get(i) instanceof MethodInsnNode insn) {
                         if (HookLibPlugin.getMethodMcpName(insn.name).equals(target)) {
                             insn.name = transformed;
-                            break;
                         }
+                    }
                 }
         }
     }

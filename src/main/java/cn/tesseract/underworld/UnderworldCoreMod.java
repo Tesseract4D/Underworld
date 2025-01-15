@@ -1,5 +1,6 @@
 package cn.tesseract.underworld;
 
+import cn.tesseract.mycelium.MyceliumCoreMod;
 import cn.tesseract.mycelium.asm.NodeTransformer;
 import cn.tesseract.mycelium.asm.minecraft.HookLibPlugin;
 import cn.tesseract.mycelium.asm.minecraft.HookLoader;
@@ -12,6 +13,7 @@ import org.objectweb.asm.tree.TypeInsnNode;
 public class UnderworldCoreMod extends HookLoader {
     @Override
     protected void registerHooks() {
+        //MyceliumCoreMod.dumpTransformedClass = true;
         registerHookContainer(UnderworldHook.class.getName());
         registerNodeTransformer("net.minecraft.block.Block", node -> {
             for (MethodNode method : node.methods) {
@@ -33,6 +35,7 @@ public class UnderworldCoreMod extends HookLoader {
 
         registerNodeTransformer("net.minecraft.client.renderer.EntityRenderer", new Replace("updateFogColor", "getNightVisionBrightness", "getFogNightVisionBrightness"));
         registerNodeTransformer("net.minecraft.client.gui.GuiIngame", new Replace("func_130015_b", "getBlockTextureFromSide", "getOverlayIcon"));
+        registerNodeTransformer("net.minecraft.world.Teleporter", new Replace("makePortal", "setBlock", "setPortalBlock"));
 
         NodeTransformer transformer = new Replace("onEntityUpdate", "travelToDimension", "travelToDimensionUnderworld");
         registerNodeTransformer("net.minecraft.entity.Entity", transformer);
