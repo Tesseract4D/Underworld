@@ -49,11 +49,13 @@ public class BlockPortalUnderworld extends BlockPortal {
         if (entityIn.ridingEntity == null && entityIn.riddenByEntity == null) {
             entityIn.setInPortal();
             IPortalData data = ((IPortalData) entityIn);
-            data.set_portalType(worldIn.getBlockMetadata(x, y, z) >> 2);
-            ChunkCoordinates pos = data.get_lastPortalPos();
-            pos.posX = x;
-            pos.posY = y;
-            pos.posZ = z;
+            int meta = worldIn.getBlockMetadata(x, y, z);
+            data.set_portalType(meta >> 2);
+            int[] portal = data.get_lastPortal();
+            portal[0] = x;
+            portal[1] = y;
+            portal[2] = z;
+            portal[3] = meta & 3;
         }
     }
 
@@ -204,6 +206,33 @@ public class BlockPortalUnderworld extends BlockPortal {
             return bottomLeft != null && width >= 2 && width <= 21 && height >= 3 && height <= 21;
         }
 
+        public int getRunegateSeed() {
+            int dirX = Direction.offsetX[leftDir], dirZ = Direction.offsetZ[leftDir];
+            int[] positions = new int[]{
+                bottomLeft.posX - dirX, bottomLeft.posY - 1, bottomLeft.posZ - dirZ,
+                bottomLeft.posX - dirX * width - 1, bottomLeft.posY - 1, bottomLeft.posZ - dirZ * width - 1,
+                bottomLeft.posX - dirX, bottomLeft.posY + height, bottomLeft.posZ - dirZ,
+                bottomLeft.posX - dirX * width - 1, bottomLeft.posY + height, bottomLeft.posZ - dirZ * width - 1
+            };
+            Block type = null;
+            for (int i = 0; i < positions.length; i += 3) {
+                Block block = world.getBlock(positions[i], positions[i + 1], positions[i + 2]);
+                if (block instanceof BlockRunestone) {
+                    if (type == null)
+                        type = block;
+                    else if (block != type)
+                        return -1;
+                } else
+                    return -1;
+            }
+            int seed = 0, bit = 0;
+            for (int i = 0; i < positions.length; i += 3) {
+                seed = seed | (world.getBlockMetadata(positions[i], positions[i + 1], positions[i + 2]) << bit);
+                bit += 4;
+            }
+            return seed;
+        }
+
         public final boolean isBottomBlock(World world, int x, int y, int z) {
             int dim = world.provider.dimensionId;
             Block block = world.getBlock(x, y, z);
@@ -213,11 +242,6 @@ public class BlockPortalUnderworld extends BlockPortal {
         public void placePortalBlocks() {
             int dirX = Direction.offsetX[leftDir], dirZ = Direction.offsetZ[leftDir];
             boolean f = false;
-
-            System.out.println(world.getBlock(bottomLeft.posX - dirX, bottomLeft.posY - 1, bottomLeft.posZ - dirZ));
-            System.out.println(world.getBlock(bottomLeft.posX - dirX * width - 1, bottomLeft.posY - 1, bottomLeft.posZ - dirZ * width - 1));
-            System.out.println(world.getBlock(bottomLeft.posX - dirX, bottomLeft.posY + height, bottomLeft.posZ - dirZ));
-            System.out.println(world.getBlock(bottomLeft.posX - dirX * width - 1, bottomLeft.posY + height, bottomLeft.posZ - dirZ * width - 1));
 
             if (bottomLeft.posY < 8)
                 for (int i = 0; i < width; ++i) {

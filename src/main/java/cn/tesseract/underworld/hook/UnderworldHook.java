@@ -3,6 +3,7 @@ package cn.tesseract.underworld.hook;
 import cn.tesseract.mycelium.asm.Hook;
 import cn.tesseract.mycelium.asm.ReturnCondition;
 import cn.tesseract.underworld.Underworld;
+import cn.tesseract.underworld.block.BlockPortalUnderworld;
 import cn.tesseract.underworld.util.ChunkPostField;
 import cn.tesseract.underworld.util.RNG;
 import cn.tesseract.underworld.world.ChunkProviderUnderworld;
@@ -48,7 +49,7 @@ public class UnderworldHook {
 
     @Hook(createMethod = true, returnCondition = ReturnCondition.ALWAYS)
     public static IIcon getOverlayIcon(BlockPortal c, int i) {
-        return c.getIcon(1, ((IPortalData) Minecraft.getMinecraft().thePlayer).get_portalType() << 2);
+        return c.getIcon(i, ((IPortalData) Minecraft.getMinecraft().thePlayer).get_portalType() << 2);
     }
 
     @Hook(createMethod = true)
@@ -56,11 +57,14 @@ public class UnderworldHook {
         if (c.inPortal) {
             int type = ((IPortalData) c).get_portalType(), dim = c.dimension;
             if (type == 0) {
-                if (dim == 0) {
+                int[] portal = ((IPortalData) c).get_lastPortal();
+                BlockPortalUnderworld.Size size = new BlockPortalUnderworld.Size(c.worldObj, portal[0], portal[1], portal[2], portal[3]);
+                if (size.getRunegateSeed() != -1) {
+                }
+                else if (dim == 0) {
                     ChunkCoordinates pos = c.worldObj.getSpawnPoint();
                     doTeleport(c, pos.posX + 0.5, c.worldObj.getTopSolidOrLiquidBlock(pos.posX, pos.posZ) + 2, pos.posZ + 0.5);
-                }
-                if (dim == -2)
+                } else if (dim == -2)
                     c.travelToDimension(0);
             } else if (type == 1) {
                 if (dim == 0)
@@ -125,7 +129,7 @@ public class UnderworldHook {
 
     @Hook(injectOnExit = true, targetMethod = "<init>")
     public static void init(Entity c, World worldIn) {
-        ((IPortalData) c).set_lastPortalPos(new ChunkCoordinates());
+        ((IPortalData) c).set_lastPortal(new int[4]);
     }
 
     @Hook(targetMethod = "<init>", injectOnLine = 1, returnCondition = ReturnCondition.ON_TRUE)

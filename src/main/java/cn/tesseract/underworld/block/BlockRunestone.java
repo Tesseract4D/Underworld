@@ -26,7 +26,7 @@ public class BlockRunestone extends BlockObsidian {
         super.registerBlockIcons(par1IIconRegister);
 
         for (int i = 0; i < this.IIconArray.length; ++i) {
-            this.IIconArray[i] = par1IIconRegister.registerIcon("betterportal:runestones/" + this.type + "/" + i);
+            this.IIconArray[i] = par1IIconRegister.registerIcon("underworld:runestones/" + this.type + "/" + i);
         }
     }
 
