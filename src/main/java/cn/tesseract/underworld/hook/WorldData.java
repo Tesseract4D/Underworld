@@ -3,7 +3,7 @@ package cn.tesseract.underworld.hook;
 import cn.tesseract.underworld.util.ChunkPostField;
 import cn.tesseract.underworld.util.RNG;
 
-public interface IWorldData {
+public interface WorldData {
     ChunkPostField get_mycelium_posts();
 
     void set_mycelium_posts(ChunkPostField field);

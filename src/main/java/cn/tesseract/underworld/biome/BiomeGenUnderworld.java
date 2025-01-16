@@ -1,7 +1,7 @@
 package cn.tesseract.underworld.biome;
 
 import cn.tesseract.underworld.Underworld;
-import cn.tesseract.underworld.hook.IWorldData;
+import cn.tesseract.underworld.hook.WorldData;
 import cn.tesseract.underworld.util.ChunkPost;
 import cn.tesseract.underworld.util.ChunkPostField;
 import net.minecraft.block.Block;
@@ -36,7 +36,7 @@ public class BiomeGenUnderworld extends BiomeGenBase {
     }
 
     private void placeMycelium(World world, int chunk_origin_x, int chunk_origin_z) {
-        ChunkPostField mycelium_posts = ((IWorldData) world).get_mycelium_posts();
+        ChunkPostField mycelium_posts = ((WorldData) world).get_mycelium_posts();
         Random random = new Random();
 
         for (int x = chunk_origin_x; x < chunk_origin_x + 16; ++x) {

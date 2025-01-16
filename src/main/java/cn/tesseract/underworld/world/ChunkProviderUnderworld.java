@@ -1,7 +1,7 @@
 package cn.tesseract.underworld.world;
 
 import cn.tesseract.underworld.Underworld;
-import cn.tesseract.underworld.hook.IWorldData;
+import cn.tesseract.underworld.hook.WorldData;
 import cn.tesseract.underworld.util.RNG;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
@@ -13,8 +13,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
-import net.minecraft.world.gen.MapGenBase;
-import net.minecraft.world.gen.MapGenCavesHell;
 import net.minecraft.world.gen.NoiseGeneratorOctaves;
 import net.minecraft.world.gen.feature.WorldGenDungeons;
 
@@ -181,7 +179,7 @@ public final class ChunkProviderUnderworld implements IChunkProvider {
         Block lava_moving_block_id = Blocks.flowing_lava;
         Block stone_block_id = Blocks.stone;
         int frequency = 128;
-        RNG rng = ((IWorldData) world).get_rng();
+        RNG rng = ((WorldData) world).get_rng();
 
         for (int attempts = 0; attempts < frequency; ++attempts) {
             ++random_number_index;

@@ -4,10 +4,12 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -44,6 +46,11 @@ public class BlockMantleOrCore extends Block {
         for (int i = 0; i < types.length; i++)
             list.add(new ItemStack(itemIn, 1, i));
     }
+
+    public boolean canCreatureSpawn(EnumCreatureType type, IBlockAccess world, int x, int y, int z) {
+        return false;
+    }
+
     public void updateTick(World world, int x, int y, int z, Random rand) {
         int n = rand.nextInt(3);
         Block block;

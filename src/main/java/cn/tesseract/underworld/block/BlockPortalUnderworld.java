@@ -1,7 +1,7 @@
 package cn.tesseract.underworld.block;
 
 import cn.tesseract.underworld.Underworld;
-import cn.tesseract.underworld.hook.IPortalData;
+import cn.tesseract.underworld.hook.PortalData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.material.Material;
@@ -48,7 +48,7 @@ public class BlockPortalUnderworld extends BlockPortal {
     public void onEntityCollidedWithBlock(World worldIn, int x, int y, int z, Entity entityIn) {
         if (entityIn.ridingEntity == null && entityIn.riddenByEntity == null) {
             entityIn.setInPortal();
-            IPortalData data = ((IPortalData) entityIn);
+            PortalData data = ((PortalData) entityIn);
             int meta = worldIn.getBlockMetadata(x, y, z);
             data.set_portalType(meta >> 2);
             int[] portal = data.get_lastPortal();

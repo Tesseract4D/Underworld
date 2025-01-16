@@ -1,6 +1,6 @@
 package cn.tesseract.underworld.hook;
 
-public interface IPortalData {
+public interface PortalData {
     int get_portalType();
 
     void set_portalType(int type);

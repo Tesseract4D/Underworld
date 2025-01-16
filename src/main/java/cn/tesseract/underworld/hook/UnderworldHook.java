@@ -25,8 +25,10 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldSettings;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+import net.minecraft.world.gen.ChunkProviderHell;
 import net.minecraft.world.storage.ISaveHandler;
 import org.lwjgl.opengl.GL11;
 
@@ -50,9 +52,9 @@ public class UnderworldHook {
     @Hook(createMethod = true)
     public static void travelToDimensionUnderworld(Entity c, int dimensionId) {
         if (c.inPortal) {
-            int type = ((IPortalData) c).get_portalType(), dim = c.dimension;
+            int type = ((PortalData) c).get_portalType(), dim = c.dimension;
             if (type == 0) {
-                int[] portal = ((IPortalData) c).get_lastPortal();
+                int[] portal = ((PortalData) c).get_lastPortal();
                 BlockPortalUnderworld.Size size = new BlockPortalUnderworld.Size(c.worldObj, portal[0], portal[1], portal[2], portal[3]);
                 if (size.getRunegateSeed() != -1) {
                 } else if (dim == 0) {
@@ -80,7 +82,7 @@ public class UnderworldHook {
 
     @Hook(createMethod = true, returnCondition = ReturnCondition.ALWAYS)
     public static IIcon getOverlayIcon(BlockPortal c, int i) {
-        return c.getIcon(i, ((IPortalData) Minecraft.getMinecraft().thePlayer).get_portalType() << 2);
+        return c.getIcon(i, ((PortalData) Minecraft.getMinecraft().thePlayer).get_portalType() << 2);
     }
 
     @Hook(returnCondition = ReturnCondition.ON_TRUE)
@@ -122,13 +124,34 @@ public class UnderworldHook {
 
     @Hook(injectOnExit = true, targetMethod = "<init>")
     public static void init(World c, ISaveHandler p_i45369_1_, String p_i45369_2_, WorldSettings p_i45369_3_, WorldProvider p_i45369_4_, Profiler p_i45369_5_) {
-        ((IWorldData) c).set_mycelium_posts(new ChunkPostField(1, c.getSeed(), 24, 0.0625F));
-        ((IWorldData) c).set_rng(new RNG(c));
+        ((WorldData) c).set_mycelium_posts(new ChunkPostField(1, c.getSeed(), 24, 0.0625F));
+        ((WorldData) c).set_rng(new RNG(c));
     }
 
     @Hook(injectOnExit = true, targetMethod = "<init>")
     public static void init(Entity c, World worldIn) {
-        ((IPortalData) c).set_lastPortal(new int[4]);
+        ((PortalData) c).set_lastPortal(new int[4]);
+    }
+
+    @Hook(injectOnExit = true)
+    public static void replaceBiomeBlocks(ChunkProviderHell c, int cx, int cz, Block[] blocks, byte[] meta, BiomeGenBase[] biomes) {
+        for (int x = 0; x < 16; ++x) {
+            for (int z = 0; z < 16; ++z) {
+                int y, i;
+                for (y = 127; y > 122; y--) {
+                    i = ((z << 4) | x) << 7 | y;
+                    if (blocks[i] == Blocks.bedrock)
+                        blocks[i] = Underworld.mantleOrCore;
+                }
+                for (y = 0; y < 5; y++) {
+                    i = ((z << 4) | x) << 7 | y;
+                    if (blocks[i] == Blocks.bedrock) {
+                        blocks[i] = Underworld.mantleOrCore;
+                        meta[i] = 1;
+                    }
+                }
+            }
+        }
     }
 
     @Hook(targetMethod = "<init>", injectOnLine = 1, returnCondition = ReturnCondition.ON_TRUE)
@@ -137,7 +160,7 @@ public class UnderworldHook {
             int maxY = blocks.length / 256;
             int base_x = c.xPosition << 4;
             int base_z = c.zPosition << 4;
-            RNG rng = ((IWorldData) world).get_rng();
+            RNG rng = ((WorldData) world).get_rng();
             Random random = new Random(world.getSeed() * (long) ChunkPostField.getIntPairHash(c.xPosition, c.zPosition));
             int y_offset = Underworld.underworld_y_offset;
             double scale_xz = 0.015625;

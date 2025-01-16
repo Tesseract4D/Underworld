@@ -1,10 +1,13 @@
 package cn.tesseract.underworld;
 
-import cn.tesseract.mycelium.MyceliumCoreMod;
+import cn.tesseract.mycelium.asm.Accessor;
 import cn.tesseract.mycelium.asm.NodeTransformer;
 import cn.tesseract.mycelium.asm.minecraft.HookLibPlugin;
 import cn.tesseract.mycelium.asm.minecraft.HookLoader;
-import cn.tesseract.underworld.hook.*;
+import cn.tesseract.underworld.hook.PortalData;
+import cn.tesseract.underworld.hook.WorldData;
+import cn.tesseract.underworld.hook.Replace;
+import cn.tesseract.underworld.hook.UnderworldHook;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -30,8 +33,8 @@ public class UnderworldCoreMod extends HookLoader {
             }
         });
 
-        registerNodeTransformer("net.minecraft.entity.Entity", new Accessor(IPortalData.class.getName()));
-        registerNodeTransformer("net.minecraft.world.World", new Accessor(IWorldData.class.getName()));
+        registerNodeTransformer("net.minecraft.entity.Entity", new Accessor(PortalData.class.getName()));
+        registerNodeTransformer("net.minecraft.world.World", new Accessor(WorldData.class.getName()));
 
         registerNodeTransformer("net.minecraft.client.renderer.EntityRenderer", new Replace("updateFogColor", "getNightVisionBrightness", "getFogNightVisionBrightness"));
         registerNodeTransformer("net.minecraft.client.gui.GuiIngame", new Replace("func_130015_b", "getBlockTextureFromSide", "getOverlayIcon"));
