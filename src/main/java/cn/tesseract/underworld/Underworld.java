@@ -1,11 +1,13 @@
 package cn.tesseract.underworld;
 
+import cn.tesseract.mycelium.asm.minecraft.HookLibPlugin;
 import cn.tesseract.underworld.biome.BiomeGenUnderworld;
 import cn.tesseract.underworld.block.BlockMantleOrCore;
 import cn.tesseract.underworld.block.BlockRunestone;
 import cn.tesseract.underworld.block.ItemBlockMantleOrCore;
-import cn.tesseract.underworld.config.ConfigOreEntry;
+import cn.tesseract.underworld.config.ConfigOreEntries;
 import cn.tesseract.underworld.config.ConfigUnderWorld;
+import cn.tesseract.underworld.config.OreEntries;
 import cn.tesseract.underworld.world.WorldProviderUnderworld;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -15,70 +17,38 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
-import net.minecraft.launchwrapper.Launch;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import org.apache.commons.io.FileUtils;
 
-import java.io.File;
-import java.util.ArrayList;
+import java.io.IOException;
 
 @Mod(modid = "underworld", acceptedMinecraftVersions = "[1.7.10]")
 public class Underworld {
     public static final int underworld_y_offset = 120;
+    public static Block bedrockLayerBlock;
     public static Block mantleOrCore;
     public static BlockRunestone runestoneMithril;
     public static BlockRunestone runestoneAdamantium;
-    public static ArrayList<ConfigOreEntry> oreEntries = new ArrayList<>();
-
-    public static ConfigUnderWorld config = new ConfigUnderWorld();
+    public static final ConfigUnderWorld config = new ConfigUnderWorld();
+    public static ConfigOreEntries ores = new ConfigOreEntries("underworld_ores", OreEntries.class);
 
     @Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent e) {
-        File oreConfigDir = new File(Launch.minecraftHome, "config/underworld");
-        if (oreConfigDir.exists()) {
-            File[] files = oreConfigDir.listFiles();
-            if (files != null)
-                for (File file : files) {
-                    if (file.isFile() && file.getName().endsWith(".properties")) {
-                        ConfigOreEntry entry = new ConfigOreEntry(file);
-                        entry.read();
-                        oreEntries.add(entry);
-                    }
-                }
-        } else {
-            oreConfigDir.mkdirs();
-            String ores = """
-                gravel,false,minecraft:gravel,0,32,0,255,minecraft:stone,30,true,false
-                infested,false,minecraft:monster_egg,0,3,0,255,minecraft:stone,40,true,false
-                oreIron,false,minecraft:iron_ore,0,6,0,255,minecraft:stone,48,false,true
-                oreCoal,true,minecraft:coal_ore,0,16,0,255,minecraft:stone,40,false,true
-                oreGold,false,minecraft:gold_ore,0,4,0,255,minecraft:stone,16,false,true
-                oreRedstone,false,minecraft:redstone_ore,0,5,0,255,minecraft:stone,8,false,true
-                oreDiamond,false,minecraft:diamond_ore,0,3,0,255,minecraft:stone,4,false,true
-                oreLapis,false,minecraft:lapis_ore,0,3,0,255,minecraft:stone,4,false,true
-                oreAdamatnium,false,*:*,0,3,0,127,minecraft:stone,1,true,true
-                orePlatinum,false,*:*,0,3,0,127,minecraft:stone,1,true,true
-                oreIridium,false,*:*,0,3,0,127,minecraft:stone,1,true,true
-                oreDebris,false,*:*,0,3,0,127,minecraft:stone,1,true,true
-                oreCopper,false,*:*,0,6,0,255,minecraft:stone,32,false,true
-                oreTin,false,*:*,0,6,0,255,minecraft:stone,16,false,true
-                oreLead,false,*:*,0,6,0,255,minecraft:stone,10,false,true
-                oreNickel,false,*:*,0,4,0,255,minecraft:stone,4,false,true
-                oreAluminum,false,*:*,0,6,0,255,minecraft:stone,16,false,true
-                oreSilver,false,*:*,0,6,0,255,minecraft:stone,8,false,true
-                oreMithril,false,*:*,0,3,0,255,minecraft:stone,8,false,true""";
-            for (String line : ores.split("\n")) {
-                String[] data = line.split(",");
-                ConfigOreEntry entry = new ConfigOreEntry("underworld/" + data[0], data);
-                entry.save(entry.toProperties());
-                oreEntries.add(entry);
-            }
-        }
+    public void preInit(FMLPreInitializationEvent e) throws IOException {
         config.read();
+
+        if (!ores.file.exists())
+            FileUtils.copyInputStreamToFile(HookLibPlugin.class.getResourceAsStream("/assets/underworld/underworld_ores.json"), ores.file);
+        ores.read();
+
+        String[] block = config.bedrock_layer_block.split(":", 2);
+        if ((bedrockLayerBlock = GameRegistry.findBlock(block[0], block[1])) == null)
+            bedrockLayerBlock = Blocks.bedrock;
+
         BiomeGenUnderworld.biome = (new BiomeGenUnderworld(26)).setColor(16711680).setBiomeName("Underworld").setDisableRain().setTemperatureRainfall(1.0F, 0.0F);
         mantleOrCore = registerBlock(new BlockMantleOrCore().setBlockName("mantleOrCore"), ItemBlockMantleOrCore.class);
         runestoneMithril = (BlockRunestone) registerBlock(new BlockRunestone("mithril").setHardness(2.4F).setResistance(20.0F).setStepSound(Block.soundTypeStone).setBlockName("runestone_mithril").setBlockTextureName("obsidian"));

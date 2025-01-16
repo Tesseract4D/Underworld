@@ -62,35 +62,7 @@ public class UnderworldDecorator extends BiomeDecorator {
     public void generateOres() {
         if (!initialized) {
             initialized = true;
-            ArrayList<WorldGenMinableUnderworld> ores = new ArrayList<>();
-            Underworld.oreEntries.forEach(a -> {
-                if (a.disable)
-                    return;
-                String[] b = a.block.split(":");
-                Block block = GameRegistry.findBlock(b[0], b[1]);
-                int meta = a.blockMeta;
-                if (block == null) {
-                    ArrayList<ItemStack> o = OreDictionary.getOres(a.oreDict);
-                    for (ItemStack k : o) {
-                        if (k.getItem() instanceof ItemBlock l) {
-                            block = l.field_150939_a;
-                            meta = k.getItemDamage();
-                            break;
-                        }
-                    }
-                }
-                if (block == null) {
-                    System.out.println("[Warning] Cannot find block for \"" + a.file.getName() + "\", ignored.");
-                    return;
-                }
-                b = a.blockToReplace.split(":");
-                Block replace = GameRegistry.findBlock(b[0], b[1]);
-                if (replace == null)
-                    replace = Blocks.stone;
-                ores.add(new WorldGenMinableUnderworld(block, meta, replace, a.veinSize, a.minY, a.maxY, a.oreDict.equals("gravel") ? a.frequency : (int) (a.frequency * ConfigUnderWorld.ore_multiplier), a.uniformDistribution, a.sizeIncreasesWithDepth));
-            });
-            oreGens = ores.toArray(new WorldGenMinableUnderworld[0]);
-            Underworld.oreEntries = null;
+            init();
         }
 
         for (WorldGenMinableUnderworld g : oreGens) {
@@ -104,5 +76,37 @@ public class UnderworldDecorator extends BiomeDecorator {
                 }
             }
         }
+    }
+
+    private void init() {
+        ArrayList<WorldGenMinableUnderworld> ores = new ArrayList<>();
+        Underworld.ores.instance.entries.forEach(a -> {
+            if (a.disable)
+                return;
+            String[] b = a.block.split(":");
+            Block block = GameRegistry.findBlock(b[0], b[1]);
+            int meta = a.blockMeta;
+            if (block == null) {
+                ArrayList<ItemStack> o = OreDictionary.getOres(a.oreDict);
+                for (ItemStack k : o) {
+                    if (k.getItem() instanceof ItemBlock l) {
+                        block = l.field_150939_a;
+                        meta = k.getItemDamage();
+                        break;
+                    }
+                }
+            }
+            if (block == null) {
+                System.out.println("[Warning] Cannot find block for \"" + a.oreDict + "\", ignored.");
+                return;
+            }
+            b = a.blockToReplace.split(":");
+            Block replace = GameRegistry.findBlock(b[0], b[1]);
+            if (replace == null)
+                replace = Blocks.stone;
+            ores.add(new WorldGenMinableUnderworld(block, meta, replace, a.veinSize, a.minY, a.maxY, a.oreDict.equals("gravel") ? a.frequency : (int) (a.frequency * Underworld.config.ore_multiplier), a.uniformDistribution, a.sizeIncreasesWithDepth));
+        });
+        oreGens = ores.toArray(new WorldGenMinableUnderworld[0]);
+        Underworld.ores = null;
     }
 }

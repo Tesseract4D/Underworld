@@ -47,11 +47,6 @@ public class UnderworldHook {
             return c.setBlock(x, y, z, blockIn, metadataIn, flags);
     }
 
-    @Hook(createMethod = true, returnCondition = ReturnCondition.ALWAYS)
-    public static IIcon getOverlayIcon(BlockPortal c, int i) {
-        return c.getIcon(i, ((IPortalData) Minecraft.getMinecraft().thePlayer).get_portalType() << 2);
-    }
-
     @Hook(createMethod = true)
     public static void travelToDimensionUnderworld(Entity c, int dimensionId) {
         if (c.inPortal) {
@@ -60,8 +55,7 @@ public class UnderworldHook {
                 int[] portal = ((IPortalData) c).get_lastPortal();
                 BlockPortalUnderworld.Size size = new BlockPortalUnderworld.Size(c.worldObj, portal[0], portal[1], portal[2], portal[3]);
                 if (size.getRunegateSeed() != -1) {
-                }
-                else if (dim == 0) {
+                } else if (dim == 0) {
                     ChunkCoordinates pos = c.worldObj.getSpawnPoint();
                     doTeleport(c, pos.posX + 0.5, c.worldObj.getTopSolidOrLiquidBlock(pos.posX, pos.posZ) + 2, pos.posZ + 0.5);
                 } else if (dim == -2)
@@ -79,12 +73,17 @@ public class UnderworldHook {
 
     public static void doTeleport(Entity e, double x, double y, double z) {
         if (e instanceof EntityPlayerMP p)
-            ((EntityPlayerMP) e).setPositionAndUpdate(x, y, z);
+            p.setPositionAndUpdate(x, y, z);
         else
             e.setPosition(x, y, z);
     }
 
-    @Hook(returnCondition = ReturnCondition.ON_TRUE, returnNull = true)
+    @Hook(createMethod = true, returnCondition = ReturnCondition.ALWAYS)
+    public static IIcon getOverlayIcon(BlockPortal c, int i) {
+        return c.getIcon(i, ((IPortalData) Minecraft.getMinecraft().thePlayer).get_portalType() << 2);
+    }
+
+    @Hook(returnCondition = ReturnCondition.ON_TRUE)
     public static boolean renderVignette(GuiIngame c, float x, int y, int z) {
         if (c.mc.theWorld.provider.dimensionId == -2) {
             GL11.glDepthMask(true);
@@ -124,7 +123,7 @@ public class UnderworldHook {
     @Hook(injectOnExit = true, targetMethod = "<init>")
     public static void init(World c, ISaveHandler p_i45369_1_, String p_i45369_2_, WorldSettings p_i45369_3_, WorldProvider p_i45369_4_, Profiler p_i45369_5_) {
         ((IWorldData) c).set_mycelium_posts(new ChunkPostField(1, c.getSeed(), 24, 0.0625F));
-        ((IWorldData) c).set_rng(new RNG());
+        ((IWorldData) c).set_rng(new RNG(c));
     }
 
     @Hook(injectOnExit = true, targetMethod = "<init>")
@@ -156,24 +155,22 @@ public class UnderworldHook {
             ChunkProviderUnderworld.bedrock_strata_3_bump_noise = ChunkProviderUnderworld.noise_gen_bedrock_strata_3_bump.generateNoiseOctaves(ChunkProviderUnderworld.bedrock_strata_3_bump_noise, base_x, 0, base_z, 16, 1, 16, scale_xz * 4.0, scale_y * 2.0, scale_xz * 4.0);
             ChunkProviderUnderworld.bedrock_strata_4_bump_noise = ChunkProviderUnderworld.noise_gen_bedrock_strata_4_bump.generateNoiseOctaves(ChunkProviderUnderworld.bedrock_strata_4_bump_noise, base_x, 0, base_z, 16, 1, 16, scale_xz * 4.0, scale_y * 2.0, scale_xz * 4.0);
             int rng_index = c.xPosition * 2653 + c.zPosition * 6714631;
-            for (int var6 = 0; var6 < 16; ++var6) {
-                for (int var7 = 0; var7 < 16; ++var7) {
+            for (int x = 0; x < 16; ++x) {
+                for (int z = 0; z < 16; ++z) {
                     int num_bedrock_blocks = random.nextInt(3) + 1;
-                    for (int var8 = -y_offset; var8 < 256 - y_offset; ++var8) {
-                        Block var9;
-                        int index;
-                        if (var8 < 0 || var8 > 127) {
-                            index = -1;
-                            if ((var8 += y_offset) < num_bedrock_blocks) {
-                                var9 = Underworld.mantleOrCore;
-                            } else if (var8 > 255 - num_bedrock_blocks) {
-                                var9 = Blocks.bedrock;
+                    for (int y = -y_offset; y < 256 - y_offset; ++y) {
+                        Block block;
+                        if (y < 0 || y > 127) {
+                            if ((y += y_offset) < num_bedrock_blocks) {
+                                block = Underworld.mantleOrCore;
+                            } else if (y > 255 - num_bedrock_blocks) {
+                                block = Blocks.bedrock;
                             } else {
-                                var9 = Blocks.stone;
-                                Block block_bedrock_id = Blocks.bedrock;
-                                int local_xz_index = var7 + var6 * 16;
+                                block = Blocks.stone;
+                                Block block_bedrock_id = Underworld.bedrockLayerBlock;
+                                int local_xz_index = z + x * 16;
                                 double bedrock_noise = Math.max(ChunkProviderUnderworld.bedrock_strata_1a_noise[local_xz_index], ChunkProviderUnderworld.bedrock_strata_1b_noise[local_xz_index]);
-                                int dy = var8 - 3;
+                                int dy = y - 3;
                                 double bump_noise = ChunkProviderUnderworld.bedrock_strata_1a_bump_noise[local_xz_index];
                                 if (bump_noise > 0.0) {
                                     bedrock_noise += bump_noise * 0.25;
@@ -188,10 +185,10 @@ public class UnderworldHook {
                                     bedrock_noise += bump_noise * 0.09375 + 0.125;
                                 }
                                 if (bedrock_noise > 0.0 && (double) dy <= bedrock_noise * 7.0) {
-                                    var9 = Blocks.bedrock;
+                                    block = Underworld.bedrockLayerBlock;
                                 }
-                                if (var9 != block_bedrock_id) {
-                                    dy = var8 - 32;
+                                if (block != block_bedrock_id) {
+                                    dy = y - 32;
                                     if ((bedrock_noise = ChunkProviderUnderworld.bedrock_strata_2_noise[local_xz_index] - bedrock_noise * 1.5) > 0.0) {
                                         if (dy > 0 && (bump_noise = ChunkProviderUnderworld.bedrock_strata_2_bump_noise[local_xz_index]) > 0.0) {
                                             bedrock_noise += bump_noise * 0.25 + 0.25;
@@ -203,12 +200,12 @@ public class UnderworldHook {
                                             dy = -dy;
                                         }
                                         if ((double) dy <= bedrock_noise * 2.0) {
-                                            var9 = Blocks.bedrock;
+                                            block = Underworld.bedrockLayerBlock;
                                         }
                                     }
                                 }
-                                if (var9 != block_bedrock_id) {
-                                    dy = var8 - 72;
+                                if (block != block_bedrock_id) {
+                                    dy = y - 72;
                                     bedrock_noise = ChunkProviderUnderworld.bedrock_strata_3_noise[local_xz_index] - ChunkProviderUnderworld.bedrock_strata_4_noise[local_xz_index] * 0.375;
                                     if ((bedrock_noise += 0.5) > 0.0) {
                                         if (dy > 0 && (bump_noise = ChunkProviderUnderworld.bedrock_strata_3_bump_noise[local_xz_index]) > 0.0) {
@@ -221,12 +218,12 @@ public class UnderworldHook {
                                             dy = -dy;
                                         }
                                         if ((double) dy <= bedrock_noise * 2.0) {
-                                            var9 = Blocks.bedrock;
+                                            block = Underworld.bedrockLayerBlock;
                                         }
                                     }
                                 }
-                                if (var9 != block_bedrock_id) {
-                                    dy = var8 - 96;
+                                if (block != block_bedrock_id) {
+                                    dy = y - 96;
                                     bedrock_noise = ChunkProviderUnderworld.bedrock_strata_4_noise[local_xz_index] - ChunkProviderUnderworld.bedrock_strata_3_noise[local_xz_index] * 0.375;
                                     if ((bedrock_noise += 0.5) > 0.0) {
                                         if (dy > 0 && (bump_noise = ChunkProviderUnderworld.bedrock_strata_4_bump_noise[local_xz_index]) > 0.0) {
@@ -239,31 +236,29 @@ public class UnderworldHook {
                                             dy = -dy;
                                         }
                                         if ((double) dy <= bedrock_noise * 2.0) {
-                                            var9 = Blocks.bedrock;
+                                            block = Underworld.bedrockLayerBlock;
                                         }
                                     }
                                 }
                             }
                         } else {
-                            index = var6 << 11 | var7 << 7 | var8;
-                            var9 = index < blocks.length ? blocks[index] : Blocks.stone;
-                            var8 += y_offset;
+                            int index = x << 11 | z << 7 | y;
+                            block = index < blocks.length ? blocks[index] : Blocks.stone;
+                            y += y_offset;
                         }
-                        if (var9 != null) {
-                            int var10 = var8 >> 4;
-                            if (c.storageArrays[var10] == null) {
-                                c.storageArrays[var10] = new ExtendedBlockStorage(var10 << 4, !world.provider.hasNoSky);
+                        if (block != null) {
+                            int section = y >> 4;
+                            if (c.storageArrays[section] == null) {
+                                c.storageArrays[section] = new ExtendedBlockStorage(section << 4, !world.provider.hasNoSky);
                             }
-                            c.storageArrays[var10].func_150818_a(var6, var8 & 0xF, var7, var9);
-                            /*
-                            if (var9.getLightValue() > 0) {
-                                c.storageArrays[var10].setExtBlocklightValue(index, var8 & 15, var7, var9.getLightValue());
+                            c.storageArrays[section].func_150818_a(x, y & 0xF, z, block);
+                            /*if (block.getLightValue() > 0) {
+                                c.storageArrays[section].setExtBlocklightValue(index, y & 15, z, block.getLightValue());
                                 if (blocks[index + 1] == null)
-                                    this.addPendingBlocklightUpdate(base_x + var6, var8, base_z + var7);
-                            }
-                             */
+                                    this.addPendingBlocklightUpdate(base_x + x, y, base_z + z);
+                            }*/
                         }
-                        var8 -= y_offset;
+                        y -= y_offset;
                     }
                 }
             }

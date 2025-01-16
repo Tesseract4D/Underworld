@@ -30,52 +30,6 @@ public class BlockRunestone extends BlockObsidian {
         }
     }
 
-    public void scheduleUpdatesForNearbyPortalBlocks(World world, int x, int y, int z) {
-        int check_x;
-        int check_y;
-        if (world.getBlock(check_x = x - 1, check_y = y + 1, z) == Blocks.portal) {
-            world.scheduleBlockUpdate(check_x, check_y, z, Blocks.portal, 1);
-        }
-
-        if (world.getBlock(check_x = x + 1, check_y = y + 1, z) == Blocks.portal) {
-            world.scheduleBlockUpdate(check_x, check_y, z, Blocks.portal, 1);
-        }
-
-        if (world.getBlock(check_x = x - 1, check_y = y - 1, z) == Blocks.portal) {
-            world.scheduleBlockUpdate(check_x, check_y, z, Blocks.portal, 1);
-        }
-
-        if (world.getBlock(check_x = x + 1, check_y = y - 1, z) == Blocks.portal) {
-            world.scheduleBlockUpdate(check_x, check_y, z, Blocks.portal, 1);
-        }
-
-        int check_z;
-        if (world.getBlock(x, check_y = y + 1, check_z = z - 1) == Blocks.portal) {
-            world.scheduleBlockUpdate(x, check_y, check_z, Blocks.portal, 1);
-        }
-
-        if (world.getBlock(x, check_y = y + 1, check_z = z + 1) == Blocks.portal) {
-            world.scheduleBlockUpdate(x, check_y, check_z, Blocks.portal, 1);
-        }
-
-        if (world.getBlock(x, check_y = y - 1, check_z = z - 1) == Blocks.portal) {
-            world.scheduleBlockUpdate(x, check_y, check_z, Blocks.portal, 1);
-        }
-
-        if (world.getBlock(x, check_y = y - 1, check_z = z + 1) == Blocks.portal) {
-            world.scheduleBlockUpdate(x, check_y, check_z, Blocks.portal, 1);
-        }
-
-    }
-
-    public void onBlockAdded(World world, int x, int y, int z) {
-        this.scheduleUpdatesForNearbyPortalBlocks(world, x, y, z);
-    }
-
-    public void onBlockPreDestroy(World world, int x, int y, int z, int metadata) {
-        this.scheduleUpdatesForNearbyPortalBlocks(world, x, y, z);
-    }
-
     public static String getMagicName(int metadata) {
         return magic_names[metadata];
     }

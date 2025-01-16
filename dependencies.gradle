@@ -35,6 +35,6 @@
  */
 dependencies {
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.5.4-GTNH:dev")
-    implementation name: '+Mycelium-2.1.5-master.1+e74b79b023-dirty-dev'
+    implementation name: '+Mycelium-2.1.6-master.4+5ab4e9b5f0-dev'
     //implementation files("libs/+Mycelium-2.1.1-dev.jar")
 }
