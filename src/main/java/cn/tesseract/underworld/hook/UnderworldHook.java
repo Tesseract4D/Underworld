@@ -54,10 +54,10 @@ public class UnderworldHook {
         if (c.inPortal) {
             int type = ((PortalData) c).get_portalType(), dim = c.dimension;
             if (type == 0) {
-                int[] portal = ((PortalData) c).get_lastPortal();
-                BlockPortalUnderworld.Size size = new BlockPortalUnderworld.Size(c.worldObj, portal[0], portal[1], portal[2], portal[3]);
-                if (size.getRunegateSeed() != -1) {
-                } else if (dim == 0) {
+                //int[] portal = ((PortalData) c).get_lastPortal();
+                //BlockPortalUnderworld.Size size = new BlockPortalUnderworld.Size(c.worldObj, portal[0], portal[1], portal[2], portal[3]);
+                //TODO ·ûÎÄÃÅÂß¼­
+                if (dim == 0) {
                     ChunkCoordinates pos = c.worldObj.getSpawnPoint();
                     doTeleport(c, pos.posX + 0.5, c.worldObj.getTopSolidOrLiquidBlock(pos.posX, pos.posZ) + 2, pos.posZ + 0.5);
                 } else if (dim == -2)
