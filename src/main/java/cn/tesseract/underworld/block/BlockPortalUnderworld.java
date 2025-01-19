@@ -60,11 +60,13 @@ public class BlockPortalUnderworld extends BlockPortal {
     }
 
     public void onNeighborBlockChange(World worldIn, int x, int y, int z, Block neighbor) {
-        int axis = worldIn.getBlockMetadata(x, y, z) & 3;
+        int meta = worldIn.getBlockMetadata(x, y, z), axis = meta & 3;
         if (axis == 1 || axis == 2) {
             Size size = new Size(worldIn, x, y, z, axis);
             if (!((size.isValid() && size.portalBlockCount == size.width * size.height)))
                 worldIn.setBlock(x, y, z, Blocks.air);
+        } else {
+            worldIn.setBlock(x, y, z, Blocks.portal, (meta | 3) & (worldIn.getBlock(x + 1, y, z) == Blocks.portal || worldIn.getBlock(x - 1, y, z) == Blocks.portal ? 1 : 2), 2);
         }
     }
 

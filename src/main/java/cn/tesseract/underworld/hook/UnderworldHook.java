@@ -3,7 +3,6 @@ package cn.tesseract.underworld.hook;
 import cn.tesseract.mycelium.asm.Hook;
 import cn.tesseract.mycelium.asm.ReturnCondition;
 import cn.tesseract.underworld.Underworld;
-import cn.tesseract.underworld.block.BlockPortalUnderworld;
 import cn.tesseract.underworld.util.ChunkPostField;
 import cn.tesseract.underworld.util.RNG;
 import cn.tesseract.underworld.world.ChunkProviderUnderworld;
@@ -44,7 +43,7 @@ public class UnderworldHook {
     @Hook(createMethod = true)
     public static boolean setPortalBlock(WorldServer c, int x, int y, int z, Block blockIn, int metadataIn, int flags) {
         if (blockIn == Blocks.portal) {
-            return c.setBlock(x, y, z, blockIn, c.provider.dimensionId == -2 ? 2 : 6, flags);
+            return c.setBlock(x, y, z, blockIn, c.provider.dimensionId == -2 ? 0 : 4, flags);
         } else
             return c.setBlock(x, y, z, blockIn, metadataIn, flags);
     }
@@ -56,7 +55,7 @@ public class UnderworldHook {
             if (type == 0) {
                 //int[] portal = ((PortalData) c).get_lastPortal();
                 //BlockPortalUnderworld.Size size = new BlockPortalUnderworld.Size(c.worldObj, portal[0], portal[1], portal[2], portal[3]);
-                //TODO ·ûÎÄÃÅÂß¼­
+                //TODO
                 if (dim == 0) {
                     ChunkCoordinates pos = c.worldObj.getSpawnPoint();
                     doTeleport(c, pos.posX + 0.5, c.worldObj.getTopSolidOrLiquidBlock(pos.posX, pos.posZ) + 2, pos.posZ + 0.5);
